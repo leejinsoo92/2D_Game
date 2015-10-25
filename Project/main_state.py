@@ -32,7 +32,6 @@ class Character:
     image = None
     attack_image = None
     state = None
-    # bullet_image = None
 
     LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5
 
@@ -43,15 +42,9 @@ class Character:
         self.attack_frame = 0
         self.attack_time = 0
         self.attack = False
-        # self.bullet = False
-
-        # self.b_x, self.b_y =  self.x + 30, self.y - 10
-        # self.bullet_frame = 0
 
         if Character.attack_image == None:
             Character.attack_image = load_image('resource/Character/Bow_attack_right.png')
-        # if Character.bullet_image == None:
-        #     Character.bullet_image = load_image('resource/Character/Bow_ball.png')
         if Character.image == None:
             Character.image = load_image('resource/Character/Bow_walk_Right.png')
 
@@ -79,7 +72,7 @@ class Character:
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
             self.state = self.ATTACK_STATE
             self.attack = True
-            # self.bullet = True
+            Bullet.createshot(0, self.x, self.y - 10)
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
             self.state = self.STAND_STATE
@@ -106,27 +99,32 @@ class Character:
                 self.attack_time = 0
                 self.attack = False
 
-        # if self.bullet == True:
-        #     self.bullet_frame = (self.bullet_frame + 1) % 2
-        #     self.b_x += 10
-
     def draw(self):
         if self.attack == False:
             self.image.clip_draw(self.frame * 100, 0, 100, 77, self.x, self.y)
-            # if self.bullet == True:
-            #     self.bullet_image.clip_draw(self.bullet_frame * 100, 0, 100, 21, self.b_x, self.b_y)
         elif self.attack == True:
             self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.x, self.y)
 
 
-
+BULLET_MAX = 200
 class Bullet:
     image = None
-    global Character
+
+    def createshot(self, type, xDot , yDot ):
+        i = 0
+        while(i < BULLET_MAX):
+            if self.flag[i] == 0:
+                self.flag[i] = 1
+                self.x[i] = xDot
+                self.y[i] = yDot
+                return
+            i += 1
 
     def __init__(self):
-        self.x, self.y = Character.x, Character.y
         self.frame = 0
+        self.x = [0] * BULLET_MAX
+        self.y = [0] * BULLET_MAX
+        self.flag = [0] * BULLET_MAX
 
         if Bullet.image == None:
             Bullet.image = load_image('resource/Character/Bow_ball.png')
@@ -134,8 +132,18 @@ class Bullet:
     def update(self):
         self.frame = (self.frame + 1) % 3
 
+        i = 0
+        while(i<BULLET_MAX):
+            if self.flag[i] ==1:
+                self.x[i] += 10
+            i += 1
+
     def draw(self):
-        self.image.clip_draw(self.frame * 100, 0, 100, 21, self.x, self.y)
+        i = 0
+        while(i < BULLET_MAX):
+            self.image.clip_draw(self.frame * 100, 0, 100, 21, self.x[i], self.y[i])
+            i += 1
+
 
 
 
@@ -216,17 +224,18 @@ class Monster:
 
 
 def enter():
-    global Character, Stage, Monster
+    global Character, Stage, Monster, Bullet
     Character = Character()
     Monster = Monster()
     Stage = Stage()
-
+    Bullet = Bullet();
 
 def exit():
-    global Character, Stage, Monster
+    global Character, Stage, Monster, Bullet
     del(Character)
     del(Monster)
     del(Stage)
+    del(Bullet)
 
 def pause():
     pass
@@ -250,13 +259,18 @@ def handle_events():
 def update():
     Character.update()
     Monster.update()
+    Bullet.update()
+
     delay(0.05)
 
 def draw():
    clear_canvas()
+
    Stage.draw()
    Character.draw()
    Monster.draw()
+   Bullet.draw()
+
    update_canvas()
 
 
