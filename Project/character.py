@@ -1,7 +1,4 @@
-from bullet import *
 from pico2d import *
-
-bullet = None
 
 class Character:
 
@@ -17,7 +14,10 @@ class Character:
 
     image = None
     attack_image = None
+    stand_image = None
     state = None
+
+    get_x = 0
 
     LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5
 
@@ -28,71 +28,103 @@ class Character:
         self.attack_frame = 0
         self.attack_time = 0
         self.attack = False
+        self.stand_frame = 0
+        self.state = self.STAND_STATE
         self.total_frame = 0.0
 
+        # Character.get_x = self.x
+
+        if Character.stand_image == None:
+            Character.stand_image = load_image('resource/Character/Bow_Stand.png')
         if Character.attack_image == None:
             Character.attack_image = load_image('resource/Character/Bow_attack_right.png')
         if Character.image == None:
             Character.image = load_image('resource/Character/Bow_walk_Right.png')
 
-    def handle_event(self, event):
+    def handle_event(self, event, bullet):
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
-            self.state = self.RIGHT_STATE
+            if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+                self.state = self.RIGHT_STATE
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
-            self.state = self.STAND_STATE
+            if self.state in (self.RIGHT_STATE,):
+                self.state = self.STAND_STATE
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
-            self.state = self.LEFT_STATE
+            if self.state in (self.UP_STATE, self.DOWN_STATE, self.RIGHT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+                self.state = self.LEFT_STATE
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
-            self.state = self.STAND_STATE
+            if self.state in (self.LEFT_STATE,):
+                self.state = self.STAND_STATE
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
-            self.state = self.UP_STATE
+            if self.state in (self.RIGHT_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+                self.state = self.UP_STATE
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_UP):
-            self.state = self.STAND_STATE
+            if self.state in (self.UP_STATE,):
+                self.state = self.STAND_STATE
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
-            self.state = self.DOWN_STATE
+            if self.state in (self.UP_STATE, self.RIGHT_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+                self.state = self.DOWN_STATE
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
-            self.state = self.STAND_STATE
+            if self.state in (self.DOWN_STATE,):
+                self.state = self.STAND_STATE
 
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
-            self.state = self.ATTACK_STATE
-            self.attack = True
-            Bullet.createshot(0, self.x, self.y - 10)
+            if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE):
+                self.state = self.ATTACK_STATE
+                self.attack = True
+                bullet.create_bullet(self.x, self.y - 10)
 
-        elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
-            self.state = self.STAND_STATE
-            self.attack = False
+        elif (event.type, event.key) == (SDL_KEYUP, SDLK_a):
+            if self.state in (self.ATTACK_STATE,):
+                self.state = self.STAND_STATE
+                self.attack = False
 
 
-    def update(self, frame_time):
+    def update(self, frame_time, bullet):
         self.distance = Character.RUN_SPEED_PPS * frame_time
         self.total_frame += Character.FRAMES_PER_ACTION * Character.ACTION_PER_TIME * frame_time
 
+        Character.get_x = self.x
 
         if self.attack == True:
-            self.attack_frame = (self.attack_frame + 1) % 3
+            self.attack_frame = int(self.total_frame) % 3
         else:
-            self.frame = (self.frame + 1) % 4
+            if self.state == self.STAND_STATE:
+                self.stand_frame = int(self.total_frame) % 3
+            else:
+                self.frame = int(self.total_frame) % 4
+
             if self.state == self.RIGHT_STATE:
-                self.x += self.speed
+                self.x += self.distance
             elif self.state == self.LEFT_STATE:
-                self.x -= self.speed
-            elif self.state == self.UP_STATE:
-                self.y += self.speed
-            elif self.state == self.DOWN_STATE:
-                self.y -= self.speed
+                self.x -= self.distance
+            elif self.state == self.UP_STATE and self.y < 220:
+                self.y += self.distance
+            elif self.state == self.DOWN_STATE and self.y > 35:
+                self.y -= self.distance
 
         if self.attack == True:
             self.attack_time += 0.5
-            if self.attack_time >= 2:
+            if self.attack_time >= 9:
                 self.attack_time = 0
                 self.attack = False
+                self.state = self.STAND_STATE
 
     def draw(self):
         if self.attack == False:
-            self.image.clip_draw(self.frame * 100, 0, 100, 77, self.x, self.y)
+            if self.state == self.STAND_STATE:
+                self.stand_image.clip_draw(self.stand_frame * 99, 0, 100, 77, self.x, self.y)
+            else:
+                self.image.clip_draw(self.frame * 100, 0, 100, 77, self.x, self.y)
         elif self.attack == True:
             self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.x, self.y)
 
+        self.draw_bb()
+
+    def get_bb(self):
+        return self.x - 50, self.y - 40, self.x + 10, self.y + 40
+
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())

@@ -11,13 +11,14 @@ logo_time = 0.0
 def enter():
     global image
     open_canvas()
+    game_framework.reset_time()
     image = load_image('resource/title/kpu_credit.png')
 
 
 def exit():
     global image
     del(image)
-    close_canvas()
+    # close_canvas()
 
 
 def update(frame_time):
@@ -40,6 +41,7 @@ def draw(frame_time):
 
 def handle_events(frame_time):
     events = get_events()
+    pass
 
 
 def pause(): pass

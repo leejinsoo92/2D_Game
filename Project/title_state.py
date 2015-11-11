@@ -36,14 +36,14 @@ def draw(frame_time):
     update_canvas()
 
 def update(frame_time):
-    global title_time
-
-    if(title_time > 0.1):
-        title_time = 0
-        #game_framework.quit()
-        game_framework.push_state(main_state)
-    title_time += frame_time
-
+    # global title_time
+    #
+    # if(title_time > 0.1):
+    #     title_time = 0
+    #     game_framework.quit()
+        # game_framework.push_state(main_state)
+    # title_time += frame_time
+    pass
 
 def pause():
     pass
