@@ -9,7 +9,7 @@ title_time = 0
 
 def enter():
     global  image
-    image = load_image('resource/title/title_test.png')
+    image = load_image('resource/title/Main_Logo.png')
 
 
 def exit():

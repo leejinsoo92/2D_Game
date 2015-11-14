@@ -84,12 +84,15 @@ def update(frame_time):
             continue
 
         if collision(monster, bullet, num, 0):
-            monster.live_flag[num] = 0
             bullet.flag[num] = 0
-            bullet.x[num] = -100
-            bullet.y[num] = -100
-            monster.x[num] = -100
-            monster.y[num] = -100
+            if bullet.flag[num] == 0:
+                bullet.x[num] = -100
+                bullet.y[num] = -100
+            monster.monster_1_nowhp[num] -= character.damage
+            if monster.monster_1_nowhp[num] <= 0:
+                monster.live_flag[num] = 0
+                monster.x[num] = -100
+                monster.y[num] = -100
 
 
 def draw(frame_time):

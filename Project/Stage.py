@@ -33,7 +33,5 @@ class Stage:
                 self.scroll += 5
                 self.offSetX -= 5
 
-        print(my_character.get_x)
-
     def draw(self):
         self.image.draw(850 + self.scroll, 300)

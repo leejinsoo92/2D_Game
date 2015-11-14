@@ -1,11 +1,15 @@
+from character import Character
 from pico2d import *
 import random
 import time
 
 MON_MAX = 50
+my_character = None
 
 class Monster:
     image = None
+    hp_image = None
+    hpcell_1_image = None
 
     PIXEL_PER_METER = (10.0 / 0.3 )         # 10 pixel 30cm
     RUN_SPEED_KMPH = 20.0                   # km / Hour
@@ -23,6 +27,8 @@ class Monster:
     MON_2, MON_3 = 0, 1
 
     def __init__(self):
+        global my_character
+        my_character = Character()
         self.x, self.y = [900] * MON_MAX, [900] * MON_MAX
         self.frame = random.randint(0, 7)
         self.run_frames = 0
@@ -35,9 +41,15 @@ class Monster:
         self.live_flag = [0] * MON_MAX
         self.pattern_type = [0] * MON_MAX
 
+        self.monster_1_maxhp = [10] * MON_MAX
+        self.monster_1_nowhp = self.monster_1_maxhp
+
         if Monster.image == None:
             Monster.image = load_image('resource//Monster/Monster_1.png')
-
+        if Monster.hp_image == None:
+            Monster.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
+        if Monster.hpcell_1_image == None:
+            Monster.hpcell_1_image = load_image('resource/UI/State/Monster_1_HpCell.png')
 
     def handle_left_run(self):
         self.x -= self.speed
@@ -100,20 +112,23 @@ class Monster:
         # self.handle_state[self.state](self)
         self.end_respone_time = time.time()
 
+
         for i in range(0, MON_MAX):
             if self.live_flag[i] == 1:
                 self.x[i] -= self.distance
 
-            if self.end_respone_time - self.start_respone_time_MON_2 >= 5:
+            if self.end_respone_time - self.start_respone_time_MON_2 >= 2:
+                print("star_respone_time_MON_2 : %d  end_respone_time: : %d" %(self.start_respone_time_MON_2, self.end_respone_time))
                 self.create_Monster_Two()
                 self.start_respone_time_MON_2 = self.end_respone_time
 
             if self.end_respone_time - self.start_respone_time_MON_3 >= 7:
+                print("star_respone_time_MON_3 : %d  end_respone_time: : %d" %(self.start_respone_time_MON_3, self.end_respone_time))
                 self.create_Monster_Three()
                 self.start_respone_time_MON_3 = self.end_respone_time
 
     def create_Monster_Two(self):
-        for num in range(3):
+        for num in range(2):
             for i in range(0, MON_MAX):
                 if self.live_flag[i] == 0:
                     self.live_flag[i] = 1
@@ -133,6 +148,10 @@ class Monster:
     def draw(self):
         for i in range(0, MON_MAX):
             self.image.clip_draw(self.frame * 100, 0, 100, 67, self.x[i], self.y[i])
+            self.hp_image.clip_draw(0, 0, 62, 12, self.x[i] - 20, self.y[i] - 40)
+            for num in range(1, self.monster_1_nowhp[i]):
+                self.hpcell_1_image.clip_draw(0, 0, 6, 10, self.x[i] - 50 + (num * 6), self.y[i] - 40)
+
 
         self.draw_bb()
 

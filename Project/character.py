@@ -31,8 +31,9 @@ class Character:
         self.stand_frame = 0
         self.state = self.STAND_STATE
         self.total_frame = 0.0
+        self.damage = 1
 
-        # Character.get_x = self.x
+
 
         if Character.stand_image == None:
             Character.stand_image = load_image('resource/Character/Bow_Stand.png')
