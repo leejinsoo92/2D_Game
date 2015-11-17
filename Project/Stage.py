@@ -13,6 +13,12 @@ class Stage:
 
     image = None
 
+    # 캐릭터 상태
+    # hp_image = None
+    # hpbar_image = None
+    # exp_image = None
+    # expbar_image = None
+
     def __init__(self):
         global my_character
         self.scroll = 0
@@ -22,6 +28,17 @@ class Stage:
 
         if self.image == None:
             self.image = load_image('resource/Map/Stage_1_1.bmp')
+
+        # 캐릭터 hp,exp
+        # if Character.hp_image == None:
+        #     Character.hp_image = load_image('resource/UI/State/character_HpCell.png')
+        # if Character.hpbar_image == None:
+        #     Character.hpbar_image = load_image('resource/UI/State/character_HpBar.png')
+        # if Character.exp_image == None:
+        #     Character.exp_image = load_image('resource/UI/State/Exp_Cell.png')
+        # if Character.expbar_image == None:
+        #     Character.expbar_image = load_image('resource/UI/State/Exp_Bar.png')
+
 
     def update(self, frame_time):
         if my_character.get_x > self.offSetX:
@@ -34,4 +51,4 @@ class Stage:
                 self.offSetX -= 5
 
     def draw(self):
-        self.image.draw(850 + self.scroll, 300)
+        self.image.draw(850 + self.scroll, 350)
