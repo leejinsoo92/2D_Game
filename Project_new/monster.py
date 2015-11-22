@@ -7,7 +7,7 @@ import main_state
 
 my_character = None
 
-class Monster:
+class Mushroom:
     image = None
     hp_image = None
     hpcell_image = None
@@ -27,10 +27,10 @@ class Monster:
 
     MON_2, MON_3 = 0, 1
 
-    def __init__(self,x, y):
+    def __init__(self):
         global my_character
         my_character = Character()
-        self.x, self.y = x, y
+        self.x, self.y = 900, random.randint(100,300)
         self.frame = random.randint(0, 7)
         self.run_frames = 0
         self.stand_frames = 0
@@ -41,6 +41,9 @@ class Monster:
         self.start_respone_time_MON_3 = time.time()
         self.live_flag = 0
         self.pattern_type = 0
+        self.mushroom_exp = 1
+
+        self.dir = -1
 
         self.draw_hp = 100
 
@@ -48,20 +51,29 @@ class Monster:
         self.Mushroom_nowhp = self.Mushroom_maxhp
         self.Mushroom_attack = 5
 
-        if Monster.image == None:
-            Monster.image = load_image('resource//Monster/Mushroom.png')
-        if Monster.hp_image == None:
-            Monster.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
-        if Monster.hpcell_image == None:
-            Monster.hpcell_image = load_image('resource/UI/State/Monster_HpCell_1.png')
+        if Mushroom.image == None:
+            Mushroom.image = load_image('resource//Monster/Mushroom.png')
+        if Mushroom.hp_image == None:
+            Mushroom.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
+        if Mushroom.hpcell_image == None:
+            Mushroom.hpcell_image = load_image('resource/UI/State/Monster_HpCell_1.png')
 
     def update(self,frame_time):
-        self.distance = Monster.RUN_SPEED_PPS * frame_time
-        self.total_frame += Monster.FRAMES_PER_ACTION * Monster.ACTION_PER_TIME * frame_time
+        self.distance = Mushroom.RUN_SPEED_PPS * frame_time
+        self.total_frame += Mushroom.FRAMES_PER_ACTION * Mushroom.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % 3
 
-        if self.x >= 450:
+        if self.dir == -1:
+            self.state = self.LEFT_RUN
             self.x -= self.distance
+            if self.x < 450:
+                self.dir = 1
+
+        elif self.dir == 1:
+            self.state = self.RIGHT_RUN
+            self.x += self.distance
+            if self.x > 800:
+                self.dir = -1
 
     def draw(self):
         self.image.clip_draw(self.frame * 100, 0, 100, 67, self.x, self.y)
@@ -78,3 +90,44 @@ class Monster:
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
+
+
+
+def create_mushroom():
+    team_data_text = '\
+{\
+    "Tiffany" : {"StartState":"LEFT_RUN", "x":900, "y":100},\
+	"Yuna"    : {"StartState":"LEFT_RUN", "x":900, "y":150},\
+	"Sunny"   : {"StartState":"LEFT_RUN", "x":1000, "y":200},\
+	"Yuri"    : {"StartState":"LEFT_RUN", "x":900, "y":250},\
+	"Jessica" : {"StartState":"LEFT_RUN", "x":1000, "y":125},\
+    "a" : {"StartState":"LEFT_RUN", "x":1200, "y":100},\
+	"b"    : {"StartState":"LEFT_RUN", "x":1400, "y":150},\
+	"d"   : {"StartState":"LEFT_RUN", "x":1400, "y":200},\
+	"q"    : {"StartState":"LEFT_RUN", "x":1200, "y":250},\
+	"e" : {"StartState":"LEFT_RUN", "x":1200, "y":125},\
+    "c" : {"StartState":"LEFT_RUN", "x":1600, "y":100},\
+	"Yna"    : {"StartState":"LEFT_RUN", "x":1700, "y":150},\
+	"Sny"   : {"StartState":"LEFT_RUN", "x":16000, "y":200},\
+	"Yri"    : {"StartState":"LEFT_RUN", "x":1600, "y":250},\
+	"Jsica" : {"StartState":"LEFT_RUN", "x":18000, "y":125}\
+}\
+'
+    yang_state_table = {
+        "LEFT_RUN" : Mushroom.LEFT_RUN,
+        "RIGTH_RUN" : Mushroom.RIGHT_RUN
+    }
+
+    team_data = json.loads(team_data_text)
+    mushrooms = []
+
+    for name in team_data:
+        mushroom = Mushroom()
+        mushroom.name = name
+        mushroom.x = team_data[name]['x']
+        mushroom.y = team_data[name]['y']
+        mushroom.mushroom_exp = 1
+        mushroom.state = yang_state_table[team_data[name]['StartState']]
+        mushrooms.append(mushroom)
+
+    return mushrooms

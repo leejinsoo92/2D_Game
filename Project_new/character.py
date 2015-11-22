@@ -64,6 +64,7 @@ class Character:
         self.timer = 0
         self.skill_frame = 0
         self.skill_holly_type = False
+        self.skill_holly_damage = 5
 
         if Character.stand_image == None:
             Character.stand_image = load_image('resource/Character/Bow_Stand.png')
@@ -198,6 +199,46 @@ class Character:
             self.now_hp = self.max_hp
             self.damage = 2
 
+        if self.level == 3:
+            self.max_hp = 200
+            self.now_hp = self.max_hp
+            self.damage = 3
+
+        if self.level == 4:
+            self.max_hp = 250
+            self.now_hp = self.max_hp
+            self.damage = 4
+
+        if self.level == 5:
+            self.max_hp = 300
+            self.now_hp = self.max_hp
+            self.damage = 5
+
+        if self.level == 6:
+            self.max_hp = 350
+            self.now_hp = self.max_hp
+            self.damage = 6
+
+        if self.level == 7:
+            self.max_hp = 400
+            self.now_hp = self.max_hp
+            self.damage = 7
+
+        if self.level == 8:
+            self.max_hp = 450
+            self.now_hp = self.max_hp
+            self.damage = 8
+
+        if self.level == 9:
+            self.max_hp = 500
+            self.now_hp = self.max_hp
+            self.damage = 9
+
+        if self.level == 10:
+            self.max_hp = 550
+            self.now_hp = self.max_hp
+            self.damage = 10
+
         #스킬 게이지 타이머
         if(self.timer != 11):
             self.timer += 1
@@ -220,6 +261,7 @@ class Character:
 
         if self.skill_holly_type == True:
             self.skill_holly[self.skill_frame].clip_draw(0,0, 410,222, self.x + 220, self.y + 30)
+            self.draw_bb_Holly()
 
         #self.skill_holly[10].clip_draw(0,0, 410, 222, self.x, self.y)
         self.hpbar_image.clip_draw( 0, 0, 206, 36, 350, 25)
@@ -248,14 +290,101 @@ class Character:
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
                 if self.now_exp == self.level_1_max_exp:
                     self.now_exp = 0
+                    self.level = 3
+
+        if self.level == 3:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 4
+
+        if self.level == 4:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 5
+
+        if self.level == 5:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 6
+
+        if self.level == 6:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 7
+
+        if self.level == 7:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 8
+
+        if self.level == 8:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 9
+
+        if self.level == 9:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
+                    self.level = 10
+
+        if self.level == 10:
+            for i in range(0, self.draw_hp) :
+                self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
+                self.draw_hp = int(self.now_hp * (100 / self.max_hp))
+            for i in range(0, self.now_exp) :
+                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
+                if self.now_exp == self.level_1_max_exp:
+                    self.now_exp = 0
                     self.level = 2
+
         self.draw_bb()
 
     def get_bb(self):
         return self.x - 50, self.y - 40, self.x + 10, self.y + 40
 
+    def get_bb_Holly(self):
+        return self.x + 50, self.y - 60, self.x + 430, self.y + 80
+
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
+
+    def draw_bb_Holly(self):
+        draw_rectangle(*self.get_bb_Holly())
 
     def getHp(self):
         return self.now_hp
