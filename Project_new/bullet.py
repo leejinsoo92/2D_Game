@@ -28,7 +28,7 @@ class Bullet:
 
     def update(self, frame_time):
         # if self.flag == 1:
-        #     self.total_frame += Bullet.FRAMES_PER_ACTION  * Bullet.ACTION_PER_TIME * frame_time
+        #     self.total_frame aaa+= Bullet.FRAMES_PER_ACTION  * Bullet.ACTION_PER_TIME * frame_time
         #     self.frame = int(self.total_frame) % 2
         #     self.x += Bullet.BULLET_SPEED_PPS * frame_time * Bullet.BULLET_SPEED
         #
@@ -49,7 +49,7 @@ class Bullet:
                 self.flag = 0
 
     def draw(self):
-        self.image.clip_draw(self.frame * 100, 0, 100, 21, self.x, self.y)
+        self.image.clip_draw(self.frame * 100, 0, 100, 21, self.x + 10, self.y)
         self.x += 20
         self.draw_bb()
 

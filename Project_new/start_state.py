@@ -35,7 +35,7 @@ def update(frame_time):
 def draw(frame_time):
     global image
     clear_canvas()
-    image.draw(400,300)
+    image.draw(400.0,300.0)
     update_canvas()
 
 

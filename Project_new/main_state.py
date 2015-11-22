@@ -15,28 +15,32 @@ import title_state
 name = "MainState"
 
 character = None
-monster_1 = None
+mushroom = None
 bullet = None
 stage = None
 font = None
 
-MON_MAX = 2
-BULLET_MAX = 200
 
+count = 0
+
+Timer = SDL_GetTicks()
+MON_MAX = 2
 def enter():
-    global character, stage, monsters_1, bullets
+    global character, stage, mushrooms, bullets, font
 
     character = Character()
-    monsters_1 = [Monster() for i in range(MON_MAX)]
+    mushrooms = []
     stage = Stage(850, 700)
     bullets = []
 
+    font = load_font('resource/UI/ENCR10B.TTF',40)
+
 def exit():
-    global character, stage,monsters_1
+    global character, stage,font
 
     del(character)
-    del(monsters_1)
     del(stage)
+    del(font)
 
 def pause():
     pass
@@ -48,13 +52,19 @@ def fire():
     global bullets
     bullets.append(Bullet(character.x, character.y))
 
+def create_monster():
+    global mushrooms
+    mushrooms.append(Monster(900, random.randint(100,300)))
+
 def handle_events(frame_time):
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-                game_framework.change_state(title_state)
+            game_framework.change_state(title_state)
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_m:
+            create_monster()
         else:
             character.handle_event(event)
             if character.state == character.ATTACK_STATE:
@@ -84,33 +94,38 @@ def collision(a, b):
     return True
 
 def update(frame_time):
-    global character, monster_1, bullet, stage
+    global character, Mushroom, bullet, stage, count, Timer
     character.update(frame_time)
-    # for bullet in bullets:
-    for monster_1 in monsters_1:
-        monster_1.update(frame_time)
+
+    for Mushroom in mushrooms:
+        Mushroom.update(frame_time)
         for bullet in bullets:
-            if collision(monster_1, bullet):
-                monster_1.monster_1_nowhp -= character.damage
+            if collision(Mushroom, bullet):
+                Mushroom.Mushroom_nowhp -= character.damage
                 bullets.remove(bullet)
 
-            if monster_1.monster_1_nowhp <= 0:
-                monster_1.live_flag = 0
-                monsters_1.remove(monster_1)
+            if Mushroom.Mushroom_nowhp <= 0:
+                character.now_exp += 1
+                Mushroom.live_flag = 0
+                mushrooms.remove(Mushroom)
 
     stage.update(frame_time)
 
 def draw(frame_time):
-   clear_canvas()
+    global Mushroom
+    clear_canvas()
 
-   stage.draw()
-   character.draw()
-   for monster_1 in monsters_1:
-       monster_1.draw()
-   for bullet in bullets:
-       bullet.draw()
+    stage.draw()
+    character.draw()
+    for Mushroom in mushrooms:
+        Mushroom.draw()
+    for bullet in bullets:
+        bullet.draw()
 
-   update_canvas()
+    font.draw(250,60,'HP:%d'%(character.getHp()))
+    font.draw(20,30,'LEVEL:%d'%(character.getLevel()))
+
+    update_canvas()
 
 
 
