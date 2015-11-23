@@ -37,9 +37,11 @@ class Character:
     SKILL_HOLLY_STATE = 6
 
     def __init__(self):
+        self.canvas_width = get_canvas_width()
+        self.canvas_height = get_canvas_height()
         self.x, self.y = 100, 150
         self.frame = 0
-        self.speed = 5
+        self.speed = 0
         self.attack_frame = 0
         self.attack_time = 0
         self.stand_frame = 0
@@ -58,13 +60,14 @@ class Character:
         self.get_exp = 1
         self.level_1_max_exp = 10
         self.now_exp = 0
+        self.dir = 0
 
         #스킬
         self.skill_gauge = 0
         self.timer = 0
         self.skill_frame = 0
         self.skill_holly_type = False
-        self.skill_holly_damage = 5
+        self.skill_holly_damage = 10
 
         if Character.stand_image == None:
             Character.stand_image = load_image('resource/Character/Bow_Stand.png')
@@ -111,20 +114,25 @@ class Character:
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
             if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.RIGHT_STATE
+                self.dir = 1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
             if self.state in (self.RIGHT_STATE,):
                 self.state = self.STAND_STATE
+                self.dir = 0
 
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
             if self.state in (self.UP_STATE, self.DOWN_STATE, self.RIGHT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.LEFT_STATE
+                self.dir = -1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
             if self.state in (self.LEFT_STATE,):
                 self.state = self.STAND_STATE
+                self.dir = 0
 
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
             if self.state in (self.RIGHT_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.UP_STATE
+                self.dir = 0
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_UP):
             if self.state in (self.UP_STATE,):
                 self.state = self.STAND_STATE
@@ -132,6 +140,7 @@ class Character:
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
             if self.state in (self.UP_STATE, self.RIGHT_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.DOWN_STATE
+                self.dir = 0
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
             if self.state in (self.DOWN_STATE,):
                 self.state = self.STAND_STATE
@@ -141,6 +150,7 @@ class Character:
             if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE):
                 self.state = self.ATTACK_STATE
                 self.attack = True
+                self.dir = 0
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_a):
             if self.state in (self.ATTACK_STATE,):
@@ -161,11 +171,18 @@ class Character:
 
 
     def update(self, frame_time):
+        def clamp(minimum, x, maximum):
+            return max(minimum, min(x, maximum))
+
         self.distance = Character.RUN_SPEED_PPS * frame_time
         self.total_frame += Character.FRAMES_PER_ACTION * Character.ACTION_PER_TIME * frame_time
         self.skill_holly_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
 
         Character.get_x = self.x
+
+        self.speed = Character.RUN_SPEED_PPS * frame_time
+        self.x += (self.dir * self.speed)
+        self.x = clamp(0, self.x, self.fl.w)
 
         if self.attack == True:
             self.attack_frame = int(self.total_frame) % 3
@@ -247,30 +264,32 @@ class Character:
             if(self.timer == 11):
                 self.timer = 0
 
-        print(self.skill_frame)
-
     def draw(self):
         self.temp = 0
+        x_left_offset = min(0,self.x-self.canvas_width//2)
+        x_right_offset = max(0,self.x - self.fl.w + self.canvas_width//2)
+        x_offset = x_left_offset + x_right_offset
+
         if self.attack == False:
             if self.state == self.STAND_STATE:
-                self.stand_image.clip_draw(self.stand_frame * 99, 0, 100, 77, self.x , self.y)
+                self.stand_image.clip_draw(self.stand_frame * 99, 0, 100, 77, self.canvas_width//2+x_offset , self.y)
             else:
-                self.image.clip_draw(self.frame * 100, 0, 100, 77, self.x, self.y)
+                self.image.clip_draw(self.frame * 100, 0, 100, 77, self.canvas_width//2+x_offset, self.y)
         elif self.attack == True:
-            self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.x, self.y)
+            self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.canvas_width//2+x_offset, self.y)
 
         if self.skill_holly_type == True:
-            self.skill_holly[self.skill_frame].clip_draw(0,0, 410,222, self.x + 220, self.y + 30)
+            self.skill_holly[self.skill_frame].clip_draw(0,0, 410,222, self.canvas_width//2+x_offset + 220, self.y + 30)
             self.draw_bb_Holly()
 
         #self.skill_holly[10].clip_draw(0,0, 410, 222, self.x, self.y)
         self.hpbar_image.clip_draw( 0, 0, 206, 36, 350, 25)
         self.expbar_image.clip_draw(0, 0, 206, 36, 600, 25)
-        self.skill_bar.clip_draw(0, 0, 104, 12, self.x - 15, self.y - 50)
+        self.skill_bar.clip_draw(0, 0, 104, 12, self.canvas_width//2+x_offset - 15, self.y - 50)
 
         #스킬 게이지
         for i in range(0,self.skill_gauge):
-            self.skill_cell.clip_draw( 0, 0, 1, 10, self.x - 64 + i, self.y - 50)
+            self.skill_cell.clip_draw( 0, 0, 1, 10, self.canvas_width//2+x_offset - 65 + i, self.y - 50)
         # 레벨
         if self.level == 1:
             for i in range(0, self.now_hp) :
@@ -375,10 +394,16 @@ class Character:
         self.draw_bb()
 
     def get_bb(self):
-        return self.x - 50, self.y - 40, self.x + 10, self.y + 40
+        x_left_offset = min(0,self.x-self.canvas_width//2)
+        x_right_offset = max(0,self.x - self.fl.w + self.canvas_width//2)
+        x_offset = x_left_offset + x_right_offset
+        return self.canvas_width//2+x_offset - 50, self.y - 40, self.canvas_width//2+x_offset + 10, self.y + 40
 
     def get_bb_Holly(self):
-        return self.x + 50, self.y - 60, self.x + 430, self.y + 80
+        x_left_offset = min(0,self.x-self.canvas_width//2)
+        x_right_offset = max(0,self.x - self.fl.w + self.canvas_width//2)
+        x_offset = x_left_offset + x_right_offset
+        return self.canvas_width//2+x_offset + 50, self.y - 60, self.canvas_width//2+x_offset + 430, self.y + 80
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
@@ -391,3 +416,6 @@ class Character:
 
     def getLevel(self):
         return self.level
+
+    def set_floor(self,fl):
+        self.fl = fl

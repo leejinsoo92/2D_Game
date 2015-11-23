@@ -1,50 +1,49 @@
+__author__ = 'HP'
 import random
 import json
 import os
 
 from monster import *
-from stage import *
+from stage2 import *
 from character import *
 from bullet import *
 from pico2d import *
 
 import game_framework
 import title_state
-import second_state
+import stage2
 
 
-name = "MainState"
+name = "Second_State"
 
 character = None
-mushroom = None
+pig = None
 bullet = None
-stage = None
+stage_2 = None
 font = None
 
 
 count = 0
 
 Timer = SDL_GetTicks()
-MON_MAX = 2
 
 def enter():
-    global character, background, mushrooms, bullets, font, floor
+    global character, pigs, bullets, font,state_2
 
     character = Character()
-    mushrooms = create_mushroom()
-    background = Background(850, 700)
-    floor = Floor()
+    pigs = create_pig()
+    state_2 = Floor2()
     bullets = list()
-    floor.set_center_object(character)
-    character.set_floor(floor)
 
+    state_2.set_center_object(character)
+    character.set_floor(state_2)
     font = load_font('resource/UI/ENCR10B.TTF',40)
 
 def exit():
-    global character, floor,font
+    global character, state_2,font
 
     del(character)
-    del(floor)
+    del(state_2)
     del(font)
 
 def pause():
@@ -55,23 +54,18 @@ def resume():
 
 def fire():
     global bullets
-    bullets.append(Bullet(character.x, character.y,floor))
+    bullets.append(Bullet(character.x, character.y,state_2))
 
 def handle_events(frame_time):
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_state(title_state)
-        elif character.x > 1000:
-            game_framework.change_state(second_state)
         else:
             character.handle_event(event)
             if character.state == character.ATTACK_STATE:
                 fire()
-            background.handle_event(event)
-            floor.handle_event(event)
+            state_2.handle_event(event)
 
 def collision(a, b):
     left_a, bottom_a, right_a, top_a = a.get_bb()
@@ -96,44 +90,44 @@ def collision_skill(a, b):
     return True
 
 def update(frame_time):
+    #global character, Mushroom, bullet, stage, count, Timer
     character.update(frame_time)
-    background.update(frame_time)
-    floor.update(frame_time)
+    state_2.update(frame_time)
 
-    for mushroom in mushrooms:
-        mushroom.update(frame_time)
-        if collision(character,mushroom):
-            character.now_hp -= mushroom.Mushroom_attack
+    print(character.skill_holly_damage)
+
+    for pig in pigs:
+        pig.update(frame_time)
+        if collision(character,pig):
+            character.now_hp -= pig.pig_attack
 
         if character.state == character.SKILL_HOLLY_STATE:
-            if collision_skill(character, mushroom):
-                mushroom.Mushroom_nowhp -= character.skill_holly_damage
+            if collision_skill(character, pig):
+                pig.pig_nowhp -= character.skill_holly_damage
 
-        if mushroom.Mushroom_nowhp <= 0:
-            character.now_exp += mushroom.mushroom_exp
-            if mushrooms.count(mushroom) > 0:
-                mushrooms.remove(mushroom)
-            if mushrooms.count(mushroom) == 0:
-                create_mushroom()
+        if pig.pig_nowhp <= 0:
+            character.now_exp += pig.pig_exp
+            if pigs.count(pig) > 0:
+                pigs.remove(pig)
+            if pigs.count(pig) == 0:
+                create_pig()
 
     for bullet in bullets:
         bullet.update(frame_time)
-        for mushroom in mushrooms:
-            if collision(mushroom, bullet):
-                mushroom.Mushroom_nowhp -= character.damage
+        for pig in pigs:
+            if collision(pig, bullet):
+                pig.pig_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
 
-
 def draw(frame_time):
+    #global Mushroom
     clear_canvas()
 
-    background.draw()
-    floor.draw()
+    state_2.draw()
     character.draw()
-
-    for mushroom in mushrooms:
-        mushroom.draw()
+    for pig in pigs:
+        pig.draw()
     for bullet in bullets:
         bullet.draw()
 
@@ -141,5 +135,6 @@ def draw(frame_time):
     font.draw(20,30,'LEVEL:%d'%(character.getLevel()))
 
     update_canvas()
+
 
 

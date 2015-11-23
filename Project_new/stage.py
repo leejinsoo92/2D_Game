@@ -3,7 +3,7 @@ from pico2d import *
 
 my_character = None
 
-class Stage:
+class Background:
 
     PIXEL_PER_METER = (10.0 / 0.3 )         # 10 pixel 30cm
     SCROLL_SPEED_KMPH = 20.0                   # km / Hour
@@ -15,8 +15,6 @@ class Stage:
 
     def __init__(self, w, h):
         global my_character
-        self.scroll = 0
-        self.offSetX = 400
         self.x = 0
         self.speed = 0
         self.speed_y = 0
@@ -32,20 +30,11 @@ class Stage:
 
 
     def update(self, frame_time):
-        # if my_character.get_x > self.offSetX:
-        #     self.scroll -= 5
-        #     self.offSetX += 5
-        #
-        # if my_character.get_x < self.offSetX:
-        #     if self.scroll != 0:
-        #         self.scroll += 5
-        #         self.offSetX -= 5
         self.left = (self.left + frame_time * self.speed) % self.image.w
 
     def draw(self):
         # self.image.draw(850 + self.scroll, 350)
         x = int(self.left)
-
         w = min(self.image.w - x, self.screen_width)
 
         self.image.clip_draw_to_origin(x, 0, w, self.screen_height, 0 ,0)
@@ -55,10 +44,36 @@ class Stage:
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN:
             if event.key == SDLK_LEFT:
-                self.speed -= Stage.SCROLL_SPEED_PPS
+                self.speed -= Background.SCROLL_SPEED_PPS
             elif event.key == SDLK_RIGHT:
-                self.speed += Stage.SCROLL_SPEED_PPS
+                self.speed += Background.SCROLL_SPEED_PPS
 
         if event.type == SDL_KEYUP:
-            if event.key == SDLK_LEFT: self.speed += Stage.SCROLL_SPEED_PPS
-            elif event.key == SDLK_RIGHT: self.speed -= Stage.SCROLL_SPEED_PPS
+            if event.key == SDLK_LEFT: self.speed += Background.SCROLL_SPEED_PPS
+            elif event.key == SDLK_RIGHT: self.speed -= Background.SCROLL_SPEED_PPS
+
+
+class Floor:
+    def __init__(self):
+        self.image = load_image('resource/Map/Floor_1.png')
+        self.speed = 0
+        self.left = 0
+        self.x = 0
+        self.canvas_width = get_canvas_width()
+        self.canvas_height = get_canvas_height()
+        self.w = self.image.w
+        self.h = self.image.h
+        self.height = 95
+
+    def set_center_object(self, character):
+        self.set_center_object = character
+
+    def draw(self):
+        self.image.clip_draw_to_origin(self.left,0,800 ,235,0,0)
+
+    def update(self,frame_time):
+        self.left = clamp(0,int(self.set_center_object.x ) - self.canvas_width//2, self.w - self.canvas_width)
+
+
+    def handle_event(self, event):
+        pass
