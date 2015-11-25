@@ -3,12 +3,14 @@ import random
 import json
 import os
 
-from monster import *
+# from monster import *
 from stage2 import *
 from character import *
 from bullet import *
 from pico2d import *
+from monster import Pig
 
+import converter
 import game_framework
 import title_state
 import stage2
@@ -22,16 +24,24 @@ bullet = None
 stage_2 = None
 font = None
 
+monster_list = []
 
-count = 0
+current_time = 0.0
+regen_time = 0.0
 
-Timer = SDL_GetTicks()
+monster_count = 30
 
 def enter():
-    global character, pigs, bullets, font,state_2
+    global character, bullets, font,state_2
+    global current_time
+
+    current_time = get_time()
 
     character = Character()
-    pigs = create_pig()
+    character.now_hp = converter.character_hp
+    character.now_exp = converter.character_exp
+    character.level = converter.character_level
+
     state_2 = Floor2()
     bullets = list()
 
@@ -55,6 +65,13 @@ def resume():
 def fire():
     global bullets
     bullets.append(Bullet(character.x, character.y,state_2))
+
+def get_frame_time():
+    global current_time
+
+    frame_time = get_time() - current_time
+    current_time += frame_time
+    return frame_time
 
 def handle_events(frame_time):
     events = get_events()
@@ -90,16 +107,31 @@ def collision_skill(a, b):
     return True
 
 def update(frame_time):
-    #global character, Mushroom, bullet, stage, count, Timer
+    global regen_time, monster_count
+    frame_time += get_frame_time()
+
+    regen_time += frame_time
+
     character.update(frame_time)
     state_2.update(frame_time)
 
-    print(character.skill_holly_damage)
+    if monster_count != 0:
+        if regen_time > Pig.REGEN_TIME:
+            pig = Pig()
+            monster_list.append(pig)
+            regen_time = 0
+            monster_count -= 1
 
-    for pig in pigs:
+    for pig in monster_list:
         pig.update(frame_time)
-        if collision(character,pig):
-            character.now_hp -= pig.pig_attack
+        if pig.attack_time == 4:
+            if collision(character,pig):
+                character.now_hp -= pig.pig_attack
+                pig.attack_time -= 1
+        if pig.attack_time != 4:
+            pig.attack_time -= 1
+            if pig.attack_time == 0:
+                pig.attack_time = 4
 
         if character.state == character.SKILL_HOLLY_STATE:
             if collision_skill(character, pig):
@@ -107,26 +139,25 @@ def update(frame_time):
 
         if pig.pig_nowhp <= 0:
             character.now_exp += pig.pig_exp
-            if pigs.count(pig) > 0:
-                pigs.remove(pig)
-            if pigs.count(pig) == 0:
-                create_pig()
+            if monster_list.count(pig) > 0:
+                monster_list.remove(pig)
 
     for bullet in bullets:
         bullet.update(frame_time)
-        for pig in pigs:
+        for pig in monster_list:
             if collision(pig, bullet):
                 pig.pig_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
+        if bullet.sx > 900:
+            bullets.remove(bullet)
 
 def draw(frame_time):
-    #global Mushroom
     clear_canvas()
 
     state_2.draw()
     character.draw()
-    for pig in pigs:
+    for pig in monster_list:
         pig.draw()
     for bullet in bullets:
         bullet.draw()

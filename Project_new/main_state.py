@@ -8,10 +8,12 @@ from character import *
 from bullet import *
 from pico2d import *
 
+import converter
 import game_framework
 import title_state
 import second_state
 
+# from monster import Mushroom
 
 name = "MainState"
 
@@ -21,17 +23,24 @@ bullet = None
 stage = None
 font = None
 
+monster_list = []
 
-count = 0
+current_time = 0.0
+regen_time = 0.0
 
-Timer = SDL_GetTicks()
-MON_MAX = 2
+monster_count = 30
 
 def enter():
-    global character, background, mushrooms, bullets, font, floor
+    global character, background, bullets, font, floor
+    global current_time
+
+    current_time = get_time()
 
     character = Character()
-    mushrooms = create_mushroom()
+    # character.now_hp = converter.character_hp
+    # character.now_exp = converter.character_exp
+    # character.level = converter.character_level
+
     background = Background(850, 700)
     floor = Floor()
     bullets = list()
@@ -57,6 +66,13 @@ def fire():
     global bullets
     bullets.append(Bullet(character.x, character.y,floor))
 
+def get_frame_time():
+    global current_time
+
+    frame_time = get_time() - current_time
+    current_time += frame_time
+    return frame_time
+
 def handle_events(frame_time):
     events = get_events()
     for event in events:
@@ -65,6 +81,9 @@ def handle_events(frame_time):
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
         elif character.x > 1000:
+            converter.character_hp = character.now_hp
+            converter.character_exp = character.now_exp
+            converter.character_level = character.level
             game_framework.change_state(second_state)
         else:
             character.handle_event(event)
@@ -96,14 +115,32 @@ def collision_skill(a, b):
     return True
 
 def update(frame_time):
+    global regen_time, monster_count
+    frame_time += get_frame_time()
+
     character.update(frame_time)
     background.update(frame_time)
     floor.update(frame_time)
 
-    for mushroom in mushrooms:
+    regen_time += frame_time
+
+    if monster_count != 0:
+        if regen_time > Mushroom.REGEN_TIME:
+            mushroom = Mushroom()
+            monster_list.append(mushroom)
+            regen_time = 0
+            monster_count -= 1
+
+    for mushroom in monster_list:
         mushroom.update(frame_time)
-        if collision(character,mushroom):
-            character.now_hp -= mushroom.Mushroom_attack
+        if mushroom.attack_time == 5:
+            if collision(character,mushroom):
+                character.now_hp -= mushroom.Mushroom_attack
+                mushroom.attack_time -= 1
+        if mushroom.attack_time != 5:
+            mushroom.attack_time -= 1
+            if mushroom.attack_time == 0:
+                mushroom.attack_time = 5
 
         if character.state == character.SKILL_HOLLY_STATE:
             if collision_skill(character, mushroom):
@@ -111,19 +148,20 @@ def update(frame_time):
 
         if mushroom.Mushroom_nowhp <= 0:
             character.now_exp += mushroom.mushroom_exp
-            if mushrooms.count(mushroom) > 0:
-                mushrooms.remove(mushroom)
-            if mushrooms.count(mushroom) == 0:
-                create_mushroom()
+            if monster_list.count(mushroom) > 0:
+                monster_list.remove(mushroom)
+            # if monster_list.count(mushroom) == 0:
+            #     create_mushroom()
 
     for bullet in bullets:
         bullet.update(frame_time)
-        for mushroom in mushrooms:
+        for mushroom in monster_list:
             if collision(mushroom, bullet):
                 mushroom.Mushroom_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
-
+        if bullet.sx > 900:
+            bullets.remove(bullet)
 
 def draw(frame_time):
     clear_canvas()
@@ -132,7 +170,7 @@ def draw(frame_time):
     floor.draw()
     character.draw()
 
-    for mushroom in mushrooms:
+    for mushroom in monster_list:
         mushroom.draw()
     for bullet in bullets:
         bullet.draw()

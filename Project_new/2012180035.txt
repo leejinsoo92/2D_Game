@@ -1,0 +1,12 @@
+Tue Nov 24 02:42:31 2015 +0900Stage Update
+Mon Nov 23 02:25:45 2015 +0900Level update
+Mon Nov 23 00:58:49 2015 +0900skill update
+Thu Nov 19 00:11:53 2015 +0900New update Monster and Bullet
+Tue Nov 17 16:19:58 2015 +0900Monster Hp setting
+Sat Nov 14 12:05:43 2015 +0900monster hp setting and image upload
+Thu Nov 12 02:59:29 2015 +0900monster and bullet collision
+Mon Nov 9 02:24:37 2015 +0900frame_time
+Mon Oct 26 03:23:41 2015 +09001026_update
+Mon Oct 19 00:04:59 2015 +09003rd week
+Fri Oct 9 19:06:16 2015 +0900new commit
+Wed Sep 30 01:23:10 2015 +0900ppt1 commit

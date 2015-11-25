@@ -22,10 +22,9 @@ class Mushroom:
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 3
 
+    REGEN_TIME = 0
 
     LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
-
-    MON_2, MON_3 = 0, 1
 
     def __init__(self):
         global my_character
@@ -37,11 +36,10 @@ class Mushroom:
         self.speed = 5
         self.state = self.LEFT_RUN
         self.total_frame = 0
-        self.start_respone_time_MON = time.time()
-        self.start_respone_time_MON_3 = time.time()
-        self.live_flag = 0
         self.pattern_type = 0
         self.mushroom_exp = 1
+
+        self.attack_time = 5
 
         self.dir = -1
 
@@ -50,6 +48,8 @@ class Mushroom:
         self.Mushroom_maxhp = 10
         self.Mushroom_nowhp = self.Mushroom_maxhp
         self.Mushroom_attack = 5
+
+        Mushroom.REGEN_TIME = 3
 
         if Mushroom.image == None:
             Mushroom.image = load_image('resource//Monster/Mushroom.png')
@@ -93,46 +93,6 @@ class Mushroom:
 
 
 
-def create_mushroom():
-    team_data_text = '\
-{\
-    "Tiffany" : {"StartState":"LEFT_RUN", "x":900, "y":100},\
-	"Yuna"    : {"StartState":"LEFT_RUN", "x":900, "y":150},\
-	"Sunny"   : {"StartState":"LEFT_RUN", "x":900, "y":200},\
-	"Yuri"    : {"StartState":"LEFT_RUN", "x":1000, "y":250},\
-	"Jessica" : {"StartState":"LEFT_RUN", "x":1000, "y":125},\
-    "Tiffa" : {"StartState":"LEFT_RUN", "x":1400, "y":100},\
-	"Yu"    : {"StartState":"LEFT_RUN", "x":1400, "y":150},\
-	"Sny"   : {"StartState":"LEFT_RUN", "x":1400, "y":200},\
-	"Yi"    : {"StartState":"LEFT_RUN", "x":1500, "y":250},\
-	"Jeica" : {"StartState":"LEFT_RUN", "x":1500, "y":125},\
-    "Tiny" : {"StartState":"LEFT_RUN", "x":1800, "y":100},\
-	"Ya"    : {"StartState":"LEFT_RUN", "x":1800, "y":150},\
-	"Suny"   : {"StartState":"LEFT_RUN", "x":1800, "y":200},\
-	"Yur"    : {"StartState":"LEFT_RUN", "x":1900, "y":250},\
-	"Jesca" : {"StartState":"LEFT_RUN", "x":1900, "y":125}\
-}\
-'
-    yang_state_table = {
-        "LEFT_RUN" : Mushroom.LEFT_RUN,
-        "RIGTH_RUN" : Mushroom.RIGHT_RUN
-    }
-
-    team_data = json.loads(team_data_text)
-    mushrooms = []
-
-    for name in team_data:
-        mushroom = Mushroom()
-        mushroom.name = name
-        mushroom.x = team_data[name]['x']
-        mushroom.y = team_data[name]['y']
-        mushroom.mushroom_exp = 1
-        mushroom.state = yang_state_table[team_data[name]['StartState']]
-        mushrooms.append(mushroom)
-
-    return mushrooms
-
-
 class Pig:
     image = None
     hp_image = None
@@ -151,7 +111,7 @@ class Pig:
 
     LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
 
-    MON_2, MON_3 = 0, 1
+    REGEN_TIME = 0
 
     def __init__(self):
         global my_character
@@ -171,9 +131,13 @@ class Pig:
 
         self.draw_hp = 100
 
+        self.attack_time = 4
+
         self.pig_maxhp = 10
         self.pig_nowhp = self.pig_maxhp
         self.pig_attack = 5
+
+        Pig.REGEN_TIME = 5
 
         if Pig.image == None:
             Pig.image = load_image('resource//Monster/Pig.png')
@@ -214,39 +178,3 @@ class Pig:
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
-
-
-
-def create_pig():
-    team_data_text = '\
-{\
-    "Tiffany" : {"StartState":"LEFT_RUN", "x":900, "y":100},\
-	"Yuna"    : {"StartState":"LEFT_RUN", "x":900, "y":150},\
-	"Sunny"   : {"StartState":"LEFT_RUN", "x":900, "y":200},\
-	"Yuri"    : {"StartState":"LEFT_RUN", "x":1000, "y":250},\
-	"Jessica" : {"StartState":"LEFT_RUN", "x":1000, "y":125},\
-    "Tiffa" : {"StartState":"LEFT_RUN", "x":1400, "y":100},\
-	"Yu"    : {"StartState":"LEFT_RUN", "x":1400, "y":150},\
-	"Sny"   : {"StartState":"LEFT_RUN", "x":1400, "y":200},\
-	"Yi"    : {"StartState":"LEFT_RUN", "x":1500, "y":250},\
-	"Jeica" : {"StartState":"LEFT_RUN", "x":1500, "y":125}\
-}\
-'
-    yang_state_table = {
-        "LEFT_RUN" : Pig.LEFT_RUN,
-        "RIGTH_RUN" : Pig.RIGHT_RUN
-    }
-
-    team_data = json.loads(team_data_text)
-    pigs = []
-
-    for name in team_data:
-        pig = Pig()
-        pig.name = name
-        pig.x = team_data[name]['x']
-        pig.y = team_data[name]['y']
-        pig.mushroom_exp = 1
-        pig.state = yang_state_table[team_data[name]['StartState']]
-        pigs.append(pig)
-
-    return pigs

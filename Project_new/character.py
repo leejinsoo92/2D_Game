@@ -19,6 +19,7 @@ class Character:
     attack_image = None
     stand_image = None
     state = None
+    die_image = None
 
     character_hp_image = None
     hpbar_image = None
@@ -32,9 +33,9 @@ class Character:
 
     get_x = 0
 
-    LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5
+    DIE_STATE, LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5, 6
 
-    SKILL_HOLLY_STATE = 6
+    SKILL_HOLLY_STATE = 7
 
     def __init__(self):
         self.canvas_width = get_canvas_width()
@@ -75,6 +76,8 @@ class Character:
             Character.attack_image = load_image('resource/Character/Bow_attack_right.png')
         if Character.image == None:
             Character.image = load_image('resource/Character/Bow_walk_Right.png')
+        if Character.die_image == None:
+            Character.die_image = load_image('resource/Character/Grave.png')
 
         # 캐릭터 hp,exp
         if Character.character_hp_image == None:
@@ -270,6 +273,9 @@ class Character:
         x_right_offset = max(0,self.x - self.fl.w + self.canvas_width//2)
         x_offset = x_left_offset + x_right_offset
 
+        if self.state == Character.DIE_STATE:
+            self.die_image.clip_draw(0, 0, 101, 47, self.canvas_width//2+x_offset , self.y)
+
         if self.attack == False:
             if self.state == self.STAND_STATE:
                 self.stand_image.clip_draw(self.stand_frame * 99, 0, 100, 77, self.canvas_width//2+x_offset , self.y)
@@ -297,7 +303,7 @@ class Character:
 
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 2
 
@@ -307,7 +313,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 3
 
@@ -317,7 +323,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 4
 
@@ -327,7 +333,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 5
 
@@ -337,7 +343,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 6
 
@@ -347,7 +353,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 7
 
@@ -357,7 +363,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 8
 
@@ -367,7 +373,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 9
 
@@ -377,7 +383,7 @@ class Character:
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
             for i in range(0, self.now_exp) :
                 self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
+                if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 10
 
@@ -385,11 +391,6 @@ class Character:
             for i in range(0, self.draw_hp) :
                 self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
-            for i in range(0, self.now_exp) :
-                self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-                if self.now_exp == self.level_1_max_exp:
-                    self.now_exp = 0
-                    self.level = 2
 
         self.draw_bb()
 
