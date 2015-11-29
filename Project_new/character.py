@@ -52,6 +52,7 @@ class Character:
         self.draw_hp = 100
 
         self.attack = False
+        self.levelup_type = False
         #캐릭터 상태
         self.level = 1
         self.damage = 1
@@ -96,22 +97,39 @@ class Character:
 
 
         # skill_Holly
-        for i in range(0,14):
-            if Character.skill_holly[i] == None:
-                if i == 0: Character.skill_holly[0] = load_image('resource/Skill/Skill_Holly/Skill_Holly_1.png')
-                if i == 1: Character.skill_holly[1] = load_image('resource/Skill/Skill_Holly/Skill_Holly_2.png')
-                if i == 2: Character.skill_holly[2] = load_image('resource/Skill/Skill_Holly/Skill_Holly_3.png')
-                if i == 3: Character.skill_holly[3] = load_image('resource/Skill/Skill_Holly/Skill_Holly_4.png')
-                if i == 4: Character.skill_holly[4] = load_image('resource/Skill/Skill_Holly/Skill_Holly_5.png')
-                if i == 5: Character.skill_holly[5] = load_image('resource/Skill/Skill_Holly/Skill_Holly_6.png')
-                if i == 6: Character.skill_holly[6] = load_image('resource/Skill/Skill_Holly/Skill_Holly_7.png')
-                if i == 7: Character.skill_holly[7] = load_image('resource/Skill/Skill_Holly/Skill_Holly_8.png')
-                if i == 8: Character.skill_holly[8] = load_image('resource/Skill/Skill_Holly/Skill_Holly_9.png')
-                if i == 9: Character.skill_holly[9] = load_image('resource/Skill/Skill_Holly/Skill_Holly_10.png')
-                if i == 10: Character.skill_holly[10] = load_image('resource/Skill/Skill_Holly/Skill_Holly_11.png')
-                if i == 11: Character.skill_holly[11] = load_image('resource/Skill/Skill_Holly/Skill_Holly_12.png')
-                if i == 12: Character.skill_holly[12] = load_image('resource/Skill/Skill_Holly/Skill_Holly_13.png')
-                if i == 13: Character.skill_holly[13] = load_image('resource/Skill/Skill_Holly/Skill_Holly_14.png')
+        # for i in range(0,14):
+        #     if Character.skill_holly[i] == None:
+        #         if i == 0: Character.skill_holly[0] = load_image('resource/Skill/Skill_Holly/Skill_Holly_1.png')
+        #         if i == 1: Character.skill_holly[1] = load_image('resource/Skill/Skill_Holly/Skill_Holly_2.png')
+        #         if i == 2: Character.skill_holly[2] = load_image('resource/Skill/Skill_Holly/Skill_Holly_3.png')
+        #         if i == 3: Character.skill_holly[3] = load_image('resource/Skill/Skill_Holly/Skill_Holly_4.png')
+        #         if i == 4: Character.skill_holly[4] = load_image('resource/Skill/Skill_Holly/Skill_Holly_5.png')
+        #         if i == 5: Character.skill_holly[5] = load_image('resource/Skill/Skill_Holly/Skill_Holly_6.png')
+        #         if i == 6: Character.skill_holly[6] = load_image('resource/Skill/Skill_Holly/Skill_Holly_7.png')
+        #         if i == 7: Character.skill_holly[7] = load_image('resource/Skill/Skill_Holly/Skill_Holly_8.png')
+        #         if i == 8: Character.skill_holly[8] = load_image('resource/Skill/Skill_Holly/Skill_Holly_9.png')
+        #         if i == 9: Character.skill_holly[9] = load_image('resource/Skill/Skill_Holly/Skill_Holly_10.png')
+        #         if i == 10: Character.skill_holly[10] = load_image('resource/Skill/Skill_Holly/Skill_Holly_11.png')
+        #         if i == 11: Character.skill_holly[11] = load_image('resource/Skill/Skill_Holly/Skill_Holly_12.png')
+        #         if i == 12: Character.skill_holly[12] = load_image('resource/Skill/Skill_Holly/Skill_Holly_13.png')
+        #         if i == 13: Character.skill_holly[13] = load_image('resource/Skill/Skill_Holly/Skill_Holly_14.png')
+
+
+        if Character.skill_holly[0] == None:
+            Character.skill_holly[0] = load_image('resource/Skill/Skill_Holly/Skill_Holly_1.png')
+            Character.skill_holly[1] = load_image('resource/Skill/Skill_Holly/Skill_Holly_2.png')
+            Character.skill_holly[2] = load_image('resource/Skill/Skill_Holly/Skill_Holly_3.png')
+            Character.skill_holly[3] = load_image('resource/Skill/Skill_Holly/Skill_Holly_4.png')
+            Character.skill_holly[4] = load_image('resource/Skill/Skill_Holly/Skill_Holly_5.png')
+            Character.skill_holly[5] = load_image('resource/Skill/Skill_Holly/Skill_Holly_6.png')
+            Character.skill_holly[6] = load_image('resource/Skill/Skill_Holly/Skill_Holly_7.png')
+            Character.skill_holly[7] = load_image('resource/Skill/Skill_Holly/Skill_Holly_8.png')
+            Character.skill_holly[8] = load_image('resource/Skill/Skill_Holly/Skill_Holly_9.png')
+            Character.skill_holly[9] = load_image('resource/Skill/Skill_Holly/Skill_Holly_10.png')
+            Character.skill_holly[10] = load_image('resource/Skill/Skill_Holly/Skill_Holly_11.png')
+            Character.skill_holly[11] = load_image('resource/Skill/Skill_Holly/Skill_Holly_12.png')
+            Character.skill_holly[12] = load_image('resource/Skill/Skill_Holly/Skill_Holly_13.png')
+            Character.skill_holly[13] = load_image('resource/Skill/Skill_Holly/Skill_Holly_14.png')
 
     def handle_event(self, event):
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
@@ -214,50 +232,59 @@ class Character:
                 self.state = self.STAND_STATE
 
         # 캐릭터 상태
-        if self.level == 2:
+        if self.level == 2 and self.levelup_type == True:
             self.max_hp = 150
             self.now_hp = self.max_hp
             self.damage = 2
+            self.levelup_type = False
 
-        if self.level == 3:
+        if self.level == 3 and self.levelup_type == True:
             self.max_hp = 200
             self.now_hp = self.max_hp
             self.damage = 3
+            self.levelup_type = False
 
-        if self.level == 4:
+        if self.level == 4 and self.levelup_type == True:
             self.max_hp = 250
             self.now_hp = self.max_hp
             self.damage = 4
+            self.levelup_type = False
 
-        if self.level == 5:
+        if self.level == 5 and self.levelup_type == True:
             self.max_hp = 300
             self.now_hp = self.max_hp
             self.damage = 5
+            self.levelup_type = False
 
-        if self.level == 6:
+        if self.level == 6 and self.levelup_type == True:
             self.max_hp = 350
             self.now_hp = self.max_hp
             self.damage = 6
+            self.levelup_type = False
 
-        if self.level == 7:
+        if self.level == 7 and self.levelup_type == True:
             self.max_hp = 400
             self.now_hp = self.max_hp
             self.damage = 7
+            self.levelup_type = False
 
-        if self.level == 8:
+        if self.level == 8 and self.levelup_type == True:
             self.max_hp = 450
             self.now_hp = self.max_hp
             self.damage = 8
+            self.levelup_type = False
 
-        if self.level == 9:
+        if self.level == 9 and self.levelup_type == True:
             self.max_hp = 500
             self.now_hp = self.max_hp
             self.damage = 9
+            self.levelup_type = False
 
-        if self.level == 10:
+        if self.level == 10 and self.levelup_type == True:
             self.max_hp = 550
             self.now_hp = self.max_hp
             self.damage = 10
+            self.levelup_type = False
 
         #스킬 게이지 타이머
         if(self.timer != 11):
@@ -306,6 +333,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 2
+                    self.levelup_type = True
 
         if self.level == 2:
             for i in range(0, self.draw_hp) :
@@ -316,6 +344,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 3
+                    self.levelup_type = True
 
         if self.level == 3:
             for i in range(0, self.draw_hp) :
@@ -326,6 +355,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 4
+                    self.levelup_type = True
 
         if self.level == 4:
             for i in range(0, self.draw_hp) :
@@ -336,6 +366,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 5
+                    self.levelup_type = True
 
         if self.level == 5:
             for i in range(0, self.draw_hp) :
@@ -346,6 +377,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 6
+                    self.levelup_type = True
 
         if self.level == 6:
             for i in range(0, self.draw_hp) :
@@ -356,6 +388,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 7
+                    self.levelup_type = True
 
         if self.level == 7:
             for i in range(0, self.draw_hp) :
@@ -366,6 +399,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 8
+                    self.levelup_type = True
 
         if self.level == 8:
             for i in range(0, self.draw_hp) :
@@ -376,6 +410,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 9
+                    self.levelup_type = True
 
         if self.level == 9:
             for i in range(0, self.draw_hp) :
@@ -386,6 +421,7 @@ class Character:
                 if self.now_exp >= self.level_1_max_exp:
                     self.now_exp = 0
                     self.level = 10
+                    self.levelup_type = True
 
         if self.level == 10:
             for i in range(0, self.draw_hp) :

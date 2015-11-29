@@ -54,8 +54,22 @@ class Background:
 
 
 class Floor:
+
+    PIXEL_PER_METER = (10.0 / 0.3 )         # 10 pixel 30cm
+    RUN_SPEED_KMPH = 20.0                   # km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 4
+
     def __init__(self):
         self.image = load_image('resource/Map/Floor_1.png')
+        self.image_next = load_image('resource/UI/Next_Move.jpg')
+        self.frame = 0
+        self.total_frame = 0.0
         self.speed = 0
         self.left = 0
         self.x = 0
@@ -70,10 +84,12 @@ class Floor:
 
     def draw(self):
         self.image.clip_draw_to_origin(self.left,0,800 ,235,0,0)
-
+        self.image_next.clip_draw(self.frame * 100, 0, 100, 44, 800, 200)
     def update(self,frame_time):
         self.left = clamp(0,int(self.set_center_object.x ) - self.canvas_width//2, self.w - self.canvas_width)
+        self.total_frame += Floor.FRAMES_PER_ACTION * Floor.ACTION_PER_TIME * frame_time
 
+        self.frame = int(self.total_frame) % 3
 
     def handle_event(self, event):
         pass
