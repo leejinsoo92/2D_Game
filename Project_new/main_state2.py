@@ -14,7 +14,7 @@ import converter
 import game_framework
 import title_state
 import stage2
-
+import main_state3
 
 name = "Second_State"
 
@@ -79,6 +79,12 @@ def handle_events(frame_time):
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
+        elif character.x > 800 :
+            converter.character_hp = character.now_hp
+            converter.character_exp = character.now_exp
+            converter.character_level = character.level
+            converter.character_drawhp = int(character.now_hp * (100 / character.max_hp))
+            game_framework.change_state(main_state3)
         else:
             character.handle_event(event)
             if character.state == character.ATTACK_STATE:

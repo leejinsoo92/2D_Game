@@ -7,13 +7,15 @@ init = None
 character_hp = 0
 character_exp = 0
 character_level = 0
+character_drawhp = 0
 
 def enter():
-    global character_hp, character_exp, character_level
+    global character_hp, character_exp, character_level, character_drawhp
     if init == None:
         character_hp = 0
         character_exp = 0
         character_level = 0
+        character_drawhp = 0
 
 def exit():
     pass

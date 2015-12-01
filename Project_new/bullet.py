@@ -42,7 +42,7 @@ class Bullet:
     def draw(self):
         self.sx = self.x - self.bg.left
         self.image.clip_draw(self.frame * 100, 0, 100, 21, self.sx, self.y)
-        self.draw_bb()
+        # self.draw_bb()
 
     def get_bb(self):
         sx = self.x - self.bg.left

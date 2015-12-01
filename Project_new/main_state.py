@@ -11,7 +11,7 @@ from pico2d import *
 import converter
 import game_framework
 import title_state
-import second_state
+import main_state2
 
 # from monster import Mushroom
 
@@ -80,11 +80,12 @@ def handle_events(frame_time):
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
-        elif character.x > 1000:
+        elif character.x > 1200 :
             converter.character_hp = character.now_hp
             converter.character_exp = character.now_exp
             converter.character_level = character.level
-            game_framework.change_state(second_state)
+            converter.character_drawhp = int(character.now_hp * (100 / character.max_hp))
+            game_framework.change_state(main_state2)
         else:
             character.handle_event(event)
             if character.state == character.ATTACK_STATE:
@@ -160,7 +161,7 @@ def update(frame_time):
                 mushroom.Mushroom_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
-        if bullet.sx > 900:
+        if bullet.sx > 1000:
             bullets.remove(bullet)
 
 def draw(frame_time):

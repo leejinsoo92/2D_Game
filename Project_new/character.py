@@ -238,49 +238,49 @@ class Character:
             self.damage = 2
             self.levelup_type = False
 
-        if self.level == 3 and self.levelup_type == True:
+        elif self.level == 3 and self.levelup_type == True:
             self.max_hp = 200
             self.now_hp = self.max_hp
             self.damage = 3
             self.levelup_type = False
 
-        if self.level == 4 and self.levelup_type == True:
+        elif self.level == 4 and self.levelup_type == True:
             self.max_hp = 250
             self.now_hp = self.max_hp
             self.damage = 4
             self.levelup_type = False
 
-        if self.level == 5 and self.levelup_type == True:
+        elif self.level == 5 and self.levelup_type == True:
             self.max_hp = 300
             self.now_hp = self.max_hp
             self.damage = 5
             self.levelup_type = False
 
-        if self.level == 6 and self.levelup_type == True:
+        elif self.level == 6 and self.levelup_type == True:
             self.max_hp = 350
             self.now_hp = self.max_hp
             self.damage = 6
             self.levelup_type = False
 
-        if self.level == 7 and self.levelup_type == True:
+        elif self.level == 7 and self.levelup_type == True:
             self.max_hp = 400
             self.now_hp = self.max_hp
             self.damage = 7
             self.levelup_type = False
 
-        if self.level == 8 and self.levelup_type == True:
+        elif self.level == 8 and self.levelup_type == True:
             self.max_hp = 450
             self.now_hp = self.max_hp
             self.damage = 8
             self.levelup_type = False
 
-        if self.level == 9 and self.levelup_type == True:
+        elif self.level == 9 and self.levelup_type == True:
             self.max_hp = 500
             self.now_hp = self.max_hp
             self.damage = 9
             self.levelup_type = False
 
-        if self.level == 10 and self.levelup_type == True:
+        elif self.level == 10 and self.levelup_type == True:
             self.max_hp = 550
             self.now_hp = self.max_hp
             self.damage = 10
@@ -428,7 +428,7 @@ class Character:
                 self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
 
-        self.draw_bb()
+        # self.draw_bb()
 
     def get_bb(self):
         x_left_offset = min(0,self.x-self.canvas_width//2)

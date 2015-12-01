@@ -4,17 +4,18 @@ import json
 import os
 
 # from monster import *
-from stage2 import *
+from stage3 import *
 from character import *
 from bullet import *
 from pico2d import *
 from monster import Pig
+from monster import Boss
 
 import converter
 import game_framework
 import title_state
-import stage2
-
+import stage3
+import main_state3
 
 name = "Second_State"
 
@@ -32,7 +33,7 @@ regen_time = 0.0
 monster_count = 30
 
 def enter():
-    global character, bullets, font,state_2
+    global character, bullets, font,state_3, boss
     global current_time
 
     current_time = get_time()
@@ -43,19 +44,21 @@ def enter():
     character.level = converter.character_level
     character.draw_hp = converter.character_drawhp
 
-    state_2 = Floor2()
+    boss = Boss()
+    state_3 = Floor3()
     bullets = list()
 
-    state_2.set_center_object(character)
-    character.set_floor(state_2)
+    state_3.set_center_object(character)
+    character.set_floor(state_3)
     font = load_font('resource/UI/ENCR10B.TTF',40)
 
 def exit():
-    global character, state_2,font
+    global character, state_3, font, boss
 
     del(character)
-    del(state_2)
+    del(state_3)
     del(font)
+    del(boss)
 
 def pause():
     pass
@@ -65,7 +68,7 @@ def resume():
 
 def fire():
     global bullets
-    bullets.append(Bullet(character.x, character.y,state_2))
+    bullets.append(Bullet(character.x, character.y,state_3))
 
 def get_frame_time():
     global current_time
@@ -83,7 +86,7 @@ def handle_events(frame_time):
             character.handle_event(event)
             if character.state == character.ATTACK_STATE:
                 fire()
-            state_2.handle_event(event)
+            state_3.handle_event(event)
 
 def collision(a, b):
     left_a, bottom_a, right_a, top_a = a.get_bb()
@@ -114,7 +117,7 @@ def update(frame_time):
     regen_time += frame_time
 
     character.update(frame_time)
-    state_2.update(frame_time)
+    state_3.update(frame_time)
 
     if monster_count != 0:
         if regen_time > Pig.REGEN_TIME:
@@ -143,6 +146,8 @@ def update(frame_time):
             if monster_list.count(pig) > 0:
                 monster_list.remove(pig)
 
+    boss.update(frame_time)
+
     for bullet in bullets:
         bullet.update(frame_time)
         for pig in monster_list:
@@ -150,14 +155,18 @@ def update(frame_time):
                 pig.pig_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
+        if collision(boss, bullet):
+            boss.boss_nowhp -= character.damage
+
         if bullet.sx > 900:
             bullets.remove(bullet)
 
 def draw(frame_time):
     clear_canvas()
 
-    state_2.draw()
+    state_3.draw()
     character.draw()
+    boss.draw()
     for pig in monster_list:
         pig.draw()
     for bullet in bullets:

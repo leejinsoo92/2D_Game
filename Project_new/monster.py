@@ -83,7 +83,7 @@ class Mushroom:
             self.draw_hp = self.Mushroom_nowhp * 10
 
 
-        self.draw_bb()
+        # self.draw_bb()
 
     def get_bb(self):
         return self.x - 40, self.y - 30, self.x + 10, self.y + 30
@@ -169,6 +169,92 @@ class Pig:
         for num in range(0, self.draw_hp):
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
             self.draw_hp = self.pig_nowhp * 10
+
+
+        # self.draw_bb()
+
+    def get_bb(self):
+        return self.x - 40, self.y - 30, self.x + 10, self.y + 30
+
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())
+
+
+class Boss:
+    image = None
+    hp_image = None
+    hpcell_image = None
+
+    PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
+    RUN_SPEED_KMPH = 20.0                   # km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 3
+
+
+    LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
+
+    REGEN_TIME = 0
+
+    def __init__(self):
+        global my_character
+        my_character = Character()
+        self.x, self.y = 800, random.randint(100,300)
+        self.frame = random.randint(0, 7)
+        self.run_frames = 0
+        self.stand_frames = 0
+        self.speed = 5
+        self.state = self.LEFT_RUN
+        self.total_frame = 0
+        self.live_flag = 0
+        self.pattern_type = 0
+        self.boss_exp = 2
+
+        self.dir = -1
+
+        self.draw_hp = 100
+
+        self.attack_time = 4
+
+        self.boss_maxhp = 400
+        self.boss_nowhp = self.boss_maxhp
+        self.boss_attack = 5
+
+        Pig.REGEN_TIME = 5
+
+        if Boss.image == None:
+            Boss.image = load_image('resource//Boss/Boss_1.png')
+        if Boss.hp_image == None:
+            Boss.hp_image = load_image('resource/UI/State/Boss_HpBar.png')
+        if Boss.hpcell_image == None:
+            Boss.hpcell_image = load_image('resource/UI/State/Boss_HpCell.png')
+
+    def update(self,frame_time):
+        self.distance = Boss.RUN_SPEED_PPS * frame_time
+        self.total_frame += Boss.FRAMES_PER_ACTION * Boss.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % 3
+
+        if self.dir == -1:
+            self.state = self.LEFT_RUN
+            self.x -= self.distance
+            if self.x < 500:
+                self.dir = 1
+
+        elif self.dir == 1:
+            self.state = self.RIGHT_RUN
+            self.x += self.distance
+            if self.x > 800:
+                self.dir = -1
+
+    def draw(self):
+        self.image.clip_draw(self.frame * 190, 0, 190, 170, self.x, self.y)
+        self.hp_image.clip_draw(0, 0, 406, 36, 400, 500)
+        for num in range(0, self.boss_nowhp):
+            self.hpcell_image.clip_draw(0, 0, 1, 30, 202 + (num), 500)
 
 
         self.draw_bb()
