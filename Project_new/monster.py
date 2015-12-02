@@ -184,6 +184,7 @@ class Boss:
     image = None
     hp_image = None
     hpcell_image = None
+    attack_image = None
 
     PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
     RUN_SPEED_KMPH = 20.0                   # km / Hour
@@ -199,6 +200,7 @@ class Boss:
     LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
 
     REGEN_TIME = 0
+    CURRENT_TIME = 0.0
 
     def __init__(self):
         global my_character
@@ -218,16 +220,18 @@ class Boss:
 
         self.draw_hp = 100
 
-        self.attack_time = 4
+        self.attack_time = 50
 
         self.boss_maxhp = 400
         self.boss_nowhp = self.boss_maxhp
         self.boss_attack = 5
 
-        Pig.REGEN_TIME = 5
+        Boss.CURRENT_TIME = get_time()
 
         if Boss.image == None:
             Boss.image = load_image('resource//Boss/Boss_1.png')
+        if Boss.attack_image == None:
+            Boss.attack_image = load_image('resource/Boss/Boss_1_Attack.png')
         if Boss.hp_image == None:
             Boss.hp_image = load_image('resource/UI/State/Boss_HpBar.png')
         if Boss.hpcell_image == None:
@@ -250,14 +254,32 @@ class Boss:
             if self.x > 800:
                 self.dir = -1
 
+        if self.attack_time == 50:
+            self.attack_time -= 1
+        if self.attack_time != 50:
+            self.attack_time -= 1
+            if self.attack_time == 0:
+                self.attack_time *= -1
+
+        print(self.attack_time)
+
     def draw(self):
-        self.image.clip_draw(self.frame * 190, 0, 190, 170, self.x, self.y)
         self.hp_image.clip_draw(0, 0, 406, 36, 400, 500)
         for num in range(0, self.boss_nowhp):
             self.hpcell_image.clip_draw(0, 0, 1, 30, 202 + (num), 500)
 
+        if self.attack_time != 0:
+            self.attack_image.clip_draw(self.frame * 200, 0, 200, 171, self.x, self.y)
+        else:
+            self.image.clip_draw(self.frame * 190, 0, 190, 170, self.x, self.y)
 
         self.draw_bb()
+
+
+    def get_frame_time(self):
+        frame_time = get_time() - Boss.CURRENT_TIME
+        Boss.CURRENT_TIME += frame_time
+        return frame_time
 
     def get_bb(self):
         return self.x - 40, self.y - 30, self.x + 10, self.y + 30
