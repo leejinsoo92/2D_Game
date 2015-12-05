@@ -8,7 +8,7 @@ from stage3 import *
 from character import *
 from bullet import *
 from pico2d import *
-from monster import Pig
+from monster import Stone
 from monster import Boss
 
 import converter
@@ -20,7 +20,7 @@ import main_state3
 name = "Second_State"
 
 character = None
-pig = None
+stone = None
 bullet = None
 stage_2 = None
 font = None
@@ -120,39 +120,39 @@ def update(frame_time):
     state_3.update(frame_time)
 
     if monster_count != 0:
-        if regen_time > Pig.REGEN_TIME:
-            pig = Pig()
-            monster_list.append(pig)
+        if regen_time > Stone.REGEN_TIME:
+            stone = Stone()
+            monster_list.append(stone)
             regen_time = 0
             monster_count -= 1
 
-    for pig in monster_list:
-        pig.update(frame_time)
-        if pig.attack_time == 4:
-            if collision(character,pig):
-                character.now_hp -= pig.pig_attack
-                pig.attack_time -= 1
-        if pig.attack_time != 4:
-            pig.attack_time -= 1
-            if pig.attack_time == 0:
-                pig.attack_time = 4
+    for stone in monster_list:
+        stone.update(frame_time)
+        if stone.attack_time == 4:
+            if collision(character,stone):
+                character.now_hp -= stone.stone_attack
+                stone.attack_time -= 1
+        if stone.attack_time != 4:
+            stone.attack_time -= 1
+            if stone.attack_time == 0:
+                stone.attack_time = 4
 
         if character.state == character.SKILL_HOLLY_STATE:
-            if collision_skill(character, pig):
-                pig.pig_nowhp -= character.skill_holly_damage
+            if collision_skill(character, stone):
+                stone.stone_nowhp -= character.skill_holly_damage
 
-        if pig.pig_nowhp <= 0:
-            character.now_exp += pig.pig_exp
-            if monster_list.count(pig) > 0:
-                monster_list.remove(pig)
+        if stone.stone_nowhp <= 0:
+            character.now_exp += stone.stone_exp
+            if monster_list.count(stone) > 0:
+                monster_list.remove(stone)
 
     boss.update(frame_time)
 
     for bullet in bullets:
         bullet.update(frame_time)
-        for pig in monster_list:
-            if collision(pig, bullet):
-                pig.pig_nowhp -= character.damage
+        for stone in monster_list:
+            if collision(stone, bullet):
+                stone.stone_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
         if collision(boss, bullet):
@@ -167,8 +167,8 @@ def draw(frame_time):
     state_3.draw()
     character.draw()
     boss.draw()
-    for pig in monster_list:
-        pig.draw()
+    for stone in monster_list:
+        stone.draw()
     for bullet in bullets:
         bullet.draw()
 

@@ -94,9 +94,6 @@ py2exe_options = dict(
     dist_dir='dist',
     )
 
-
-resources = "resource".split()
-
 if platform.architecture()[0] == '32bit':
     sdl_folder = './SDL2/x86/'
 else:

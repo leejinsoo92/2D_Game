@@ -133,7 +133,7 @@ class Pig:
 
         self.attack_time = 4
 
-        self.pig_maxhp = 10
+        self.pig_maxhp = 30
         self.pig_nowhp = self.pig_maxhp
         self.pig_attack = 5
 
@@ -168,7 +168,7 @@ class Pig:
         self.hp_image.clip_draw(0, 0, 104, 12, self.x - 20, self.y - 40)
         for num in range(0, self.draw_hp):
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
-            self.draw_hp = self.pig_nowhp * 10
+            self.draw_hp = int(self.pig_nowhp * 10 / 3 )
 
 
         # self.draw_bb()
@@ -179,6 +179,92 @@ class Pig:
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
 
+
+class Stone:
+    image = None
+    hp_image = None
+    hpcell_image = None
+
+    PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
+    RUN_SPEED_KMPH = 20.0                   # km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 3
+
+
+    LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
+
+    REGEN_TIME = 0
+
+    def __init__(self):
+        global my_character
+        my_character = Character()
+        self.x, self.y = 900, random.randint(100,300)
+        self.frame = random.randint(0, 7)
+        self.run_frames = 0
+        self.stand_frames = 0
+        self.speed = 5
+        self.state = self.LEFT_RUN
+        self.total_frame = 0
+        self.live_flag = 0
+        self.pattern_type = 0
+        self.stone_exp = 3
+
+        self.dir = -1
+
+        self.draw_hp = 100
+
+        self.attack_time = 4
+
+        self.stone_maxhp = 60
+        self.stone_nowhp = self.stone_maxhp
+        self.stone_attack = 15
+
+        Stone.REGEN_TIME = 5
+
+        if Stone.image == None:
+            Stone.image = load_image('resource//Monster/Stone.png')
+        if Stone.hp_image == None:
+            Stone.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
+        if Stone.hpcell_image == None:
+            Stone.hpcell_image = load_image('resource/UI/State/Monster_HpCell_1.png')
+
+    def update(self,frame_time):
+        self.distance = Stone.RUN_SPEED_PPS * frame_time
+        self.total_frame += Stone.FRAMES_PER_ACTION * Stone.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % 3
+
+        if self.dir == -1:
+            self.state = self.LEFT_RUN
+            self.x -= self.distance
+            if self.x < 10:
+                self.dir = 1
+
+        elif self.dir == 1:
+            self.state = self.RIGHT_RUN
+            self.x += self.distance
+            if self.x > 800:
+                self.dir = -1
+
+    def draw(self):
+        self.image.clip_draw(self.frame * 200, 0, 200, 153, self.x, self.y)
+        self.hp_image.clip_draw(0, 0, 104, 12, self.x - 20, self.y - 40)
+        for num in range(0, self.draw_hp):
+            self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
+            self.draw_hp = int( self.stone_nowhp * 10 / 6)
+
+
+        self.draw_bb()
+
+    def get_bb(self):
+        return self.x - 60, self.y - 40, self.x + 30, self.y + 40
+
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())
 
 class Boss:
     image = None
