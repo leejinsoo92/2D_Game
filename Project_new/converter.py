@@ -8,14 +8,19 @@ character_hp = 0
 character_exp = 0
 character_level = 0
 character_drawhp = 0
+character_nowhp = 0
+character_maxhp = 0
+chracter_damage = 0
 
 def enter():
-    global character_hp, character_exp, character_level, character_drawhp
+    global character_exp, character_level, character_drawhp, chracter_damage,chracter_nowhp, character_maxhp
     if init == None:
-        character_hp = 0
         character_exp = 0
         character_level = 0
         character_drawhp = 0
+        chracter_nowhp = 0
+        character_maxhp = 0
+        chracter_damage = 0
 
 def exit():
     pass

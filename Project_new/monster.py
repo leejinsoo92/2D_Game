@@ -54,9 +54,9 @@ class Mushroom:
         if Mushroom.image == None:
             Mushroom.image = load_image('resource//Monster/Mushroom.png')
         if Mushroom.hp_image == None:
-            Mushroom.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
+            Mushroom.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Mushroom.hpcell_image == None:
-            Mushroom.hpcell_image = load_image('resource/UI/State/Monster_HpCell_1.png')
+            Mushroom.hpcell_image = load_image('resource/UI/Monster_HpCell_1.png')
 
     def update(self,frame_time):
         self.distance = Mushroom.RUN_SPEED_PPS * frame_time
@@ -142,9 +142,9 @@ class Pig:
         if Pig.image == None:
             Pig.image = load_image('resource//Monster/Pig.png')
         if Pig.hp_image == None:
-            Pig.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
+            Pig.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Pig.hpcell_image == None:
-            Pig.hpcell_image = load_image('resource/UI/State/Monster_HpCell_1.png')
+            Pig.hpcell_image = load_image('resource/UI/Monster_HpCell_1.png')
 
     def update(self,frame_time):
         self.distance = Pig.RUN_SPEED_PPS * frame_time
@@ -227,11 +227,11 @@ class Stone:
         Stone.REGEN_TIME = 5
 
         if Stone.image == None:
-            Stone.image = load_image('resource//Monster/Stone.png')
+            Stone.image = load_image('resource/Monster/Stone.png')
         if Stone.hp_image == None:
-            Stone.hp_image = load_image('resource/UI/State/Monster_HpBar.png')
+            Stone.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Stone.hpcell_image == None:
-            Stone.hpcell_image = load_image('resource/UI/State/Monster_HpCell_1.png')
+            Stone.hpcell_image = load_image('resource/UI/Monster_HpCell_1.png')
 
     def update(self,frame_time):
         self.distance = Stone.RUN_SPEED_PPS * frame_time
@@ -301,6 +301,7 @@ class Boss:
         self.live_flag = 0
         self.pattern_type = 0
         self.boss_exp = 2
+        self.pattern_type = 1
 
         self.dir = -1
 
@@ -315,13 +316,13 @@ class Boss:
         Boss.CURRENT_TIME = get_time()
 
         if Boss.image == None:
-            Boss.image = load_image('resource//Boss/Boss_1.png')
+            Boss.image = load_image('resource/Boss/Boss_1.png')
         if Boss.attack_image == None:
             Boss.attack_image = load_image('resource/Boss/Boss_1_Attack.png')
         if Boss.hp_image == None:
-            Boss.hp_image = load_image('resource/UI/State/Boss_HpBar.png')
+            Boss.hp_image = load_image('resource/UI/Boss_HpBar.png')
         if Boss.hpcell_image == None:
-            Boss.hpcell_image = load_image('resource/UI/State/Boss_HpCell.png')
+            Boss.hpcell_image = load_image('resource/UI/Boss_HpCell.png')
 
     def update(self,frame_time):
         self.distance = Boss.RUN_SPEED_PPS * frame_time
@@ -341,11 +342,12 @@ class Boss:
                 self.dir = -1
 
         if self.attack_time == 50:
-            self.attack_time -= 1
+            self.pattern_type *= -1
+            self.attack_time -= self.pattern_type
         if self.attack_time != 50:
-            self.attack_time -= 1
+            self.attack_time -= self.pattern_type
             if self.attack_time == 0:
-                self.attack_time *= -1
+                self.pattern_type *= -1
 
         print(self.attack_time)
 

@@ -84,7 +84,10 @@ def handle_events(frame_time):
             converter.character_hp = character.now_hp
             converter.character_exp = character.now_exp
             converter.character_level = character.level
+            converter.character_nowhp = character.now_hp
+            converter.character_maxhp = character.max_hp
             converter.character_drawhp = int(character.now_hp * (100 / character.max_hp))
+            converter.chracter_damage = character.damage
             game_framework.change_state(main_state2)
         else:
             character.handle_event(event)

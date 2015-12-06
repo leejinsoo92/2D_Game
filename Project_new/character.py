@@ -82,18 +82,18 @@ class Character:
 
         # 캐릭터 hp,exp
         if Character.character_hp_image == None:
-            Character.character_hp_image = load_image('resource/UI/State/character_HpCell.png')
+            Character.character_hp_image = load_image('resource/UI/character_HpCell.png')
         if Character.hpbar_image == None:
-            Character.hpbar_image = load_image('resource/UI/State/character_HpBar.png')
+            Character.hpbar_image = load_image('resource/UI/character_HpBar.png')
         if Character.exp_image == None:
-            Character.exp_image = load_image('resource/UI/State/Exp_Cell.png')
+            Character.exp_image = load_image('resource/UI/Exp_Cell.png')
         if Character.expbar_image == None:
-            Character.expbar_image = load_image('resource/UI/State/Exp_Bar.png')
+            Character.expbar_image = load_image('resource/UI/Exp_Bar.png')
         # skill 게이지
         if Character.skill_bar == None:
-            Character.skill_bar = load_image('resource/UI/State/Skill_Bar.png')
+            Character.skill_bar = load_image('resource/UI/Skill_Bar.png')
         if Character.skill_cell == None:
-            Character.skill_cell = load_image('resource/UI/State/Skill_Cell.png')
+            Character.skill_cell = load_image('resource/UI/Skill_Cell.png')
 
 
         # skill_Holly

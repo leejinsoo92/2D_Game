@@ -38,10 +38,12 @@ def enter():
     current_time = get_time()
 
     character = Character()
-    character.now_hp = converter.character_hp
     character.now_exp = converter.character_exp
     character.level = converter.character_level
-    character.draw_hp = converter.character_drawhp
+    character.draw_hp = int(converter.character_nowhp * (100 / converter.character_maxhp))
+    character.now_hp = converter.character_nowhp
+    character.max_hp = converter.character_maxhp
+    character.damage = converter.chracter_damage
 
     state_2 = Floor2()
     bullets = list()
@@ -80,10 +82,12 @@ def handle_events(frame_time):
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif character.x > 800 :
-            converter.character_hp = character.now_hp
             converter.character_exp = character.now_exp
             converter.character_level = character.level
+            converter.character_nowhp = character.now_hp
+            converter.character_maxhp = character.max_hp
             converter.character_drawhp = int(character.now_hp * (100 / character.max_hp))
+            converter.chracter_damage = character.damage
             game_framework.change_state(main_state3)
         else:
             character.handle_event(event)

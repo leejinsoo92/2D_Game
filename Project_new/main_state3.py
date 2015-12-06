@@ -39,10 +39,12 @@ def enter():
     current_time = get_time()
 
     character = Character()
-    character.now_hp = converter.character_hp
     character.now_exp = converter.character_exp
     character.level = converter.character_level
-    character.draw_hp = converter.character_drawhp
+    character.now_hp = converter.character_nowhp
+    character.max_hp = converter.character_maxhp
+    character.draw_hp = int(converter.character_nowhp * (100 / converter.character_maxhp))
+    character.damage = converter.chracter_damage
 
     boss = Boss()
     state_3 = Floor3()
