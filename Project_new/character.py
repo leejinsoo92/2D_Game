@@ -114,7 +114,9 @@ class Character:
         #         if i == 12: Character.skill_holly[12] = load_image('resource/Skill/Skill_Holly/Skill_Holly_13.png')
         #         if i == 13: Character.skill_holly[13] = load_image('resource/Skill/Skill_Holly/Skill_Holly_14.png')
 
-
+        # if Character.skill_holly == None:
+        #     Character.skill_holly = load_image('resource/Skill/holly_test.jpg')
+        #
         if Character.skill_holly[0] == None:
             Character.skill_holly[0] = load_image('resource/Skill/Skill_Holly/Skill_Holly_1.png')
             Character.skill_holly[1] = load_image('resource/Skill/Skill_Holly/Skill_Holly_2.png')
@@ -218,11 +220,13 @@ class Character:
             elif self.state == self.DOWN_STATE and self.y > 100:
                 self.y -= self.distance
 
+        # if self.skill_holly_type == True:
+        #     self.skill_frame = int(self.total_frame) % 14
         if self.skill_holly_type == True:
             self.skill_frame = int(self.skill_holly_frame) % 14
             if self.skill_frame == 13:
                 self.skill_holly_type = False
-                self.skill_frame = 0
+                # self.skill_frame = 0
 
         if self.attack == True:
             self.attack_time += 0.5
@@ -311,11 +315,15 @@ class Character:
         elif self.attack == True:
             self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.canvas_width//2+x_offset, self.y)
 
+        # if self.skill_holly_type == True:
+        #     self.skill_holly.clip_draw(self.skill_frame * 450,0, 450,214, self.canvas_width//2+x_offset + 220, self.y + 30)
+
         if self.skill_holly_type == True:
             self.skill_holly[self.skill_frame].clip_draw(0,0, 410,222, self.canvas_width//2+x_offset + 220, self.y + 30)
-            self.draw_bb_Holly()
+            # self.draw_bb_Holly()
 
-        #self.skill_holly[10].clip_draw(0,0, 410, 222, self.x, self.y)
+        # self.skill_holly[10].clip_draw(0,0, 410, 222, self.x, self.y)
+
         self.hpbar_image.clip_draw( 0, 0, 206, 36, 350, 25)
         self.expbar_image.clip_draw(0, 0, 206, 36, 600, 25)
         self.skill_bar.clip_draw(0, 0, 104, 12, self.canvas_width//2+x_offset - 15, self.y - 50)
