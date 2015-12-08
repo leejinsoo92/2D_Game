@@ -97,26 +97,6 @@ class Character:
 
 
         # skill_Holly
-        # for i in range(0,14):
-        #     if Character.skill_holly[i] == None:
-        #         if i == 0: Character.skill_holly[0] = load_image('resource/Skill/Skill_Holly/Skill_Holly_1.png')
-        #         if i == 1: Character.skill_holly[1] = load_image('resource/Skill/Skill_Holly/Skill_Holly_2.png')
-        #         if i == 2: Character.skill_holly[2] = load_image('resource/Skill/Skill_Holly/Skill_Holly_3.png')
-        #         if i == 3: Character.skill_holly[3] = load_image('resource/Skill/Skill_Holly/Skill_Holly_4.png')
-        #         if i == 4: Character.skill_holly[4] = load_image('resource/Skill/Skill_Holly/Skill_Holly_5.png')
-        #         if i == 5: Character.skill_holly[5] = load_image('resource/Skill/Skill_Holly/Skill_Holly_6.png')
-        #         if i == 6: Character.skill_holly[6] = load_image('resource/Skill/Skill_Holly/Skill_Holly_7.png')
-        #         if i == 7: Character.skill_holly[7] = load_image('resource/Skill/Skill_Holly/Skill_Holly_8.png')
-        #         if i == 8: Character.skill_holly[8] = load_image('resource/Skill/Skill_Holly/Skill_Holly_9.png')
-        #         if i == 9: Character.skill_holly[9] = load_image('resource/Skill/Skill_Holly/Skill_Holly_10.png')
-        #         if i == 10: Character.skill_holly[10] = load_image('resource/Skill/Skill_Holly/Skill_Holly_11.png')
-        #         if i == 11: Character.skill_holly[11] = load_image('resource/Skill/Skill_Holly/Skill_Holly_12.png')
-        #         if i == 12: Character.skill_holly[12] = load_image('resource/Skill/Skill_Holly/Skill_Holly_13.png')
-        #         if i == 13: Character.skill_holly[13] = load_image('resource/Skill/Skill_Holly/Skill_Holly_14.png')
-
-        # if Character.skill_holly == None:
-        #     Character.skill_holly = load_image('resource/Skill/holly_test.jpg')
-        #
         if Character.skill_holly[0] == None:
             Character.skill_holly[0] = load_image('resource/Skill/Skill_Holly/Skill_Holly_1.png')
             Character.skill_holly[1] = load_image('resource/Skill/Skill_Holly/Skill_Holly_2.png')
@@ -182,11 +162,12 @@ class Character:
 
         #skill_holly
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            if (self.skill_gauge >= 10):
+            self.skill_frame = 0
+            if (self.skill_gauge >= 1):
                 if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE):
                     self.state = self.SKILL_HOLLY_STATE
                     self.skill_holly_type = True
-                    self.skill_gauge -= 10
+                    self.skill_gauge -= 1
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_q):
             if self.state in (self.SKILL_HOLLY_STATE,):

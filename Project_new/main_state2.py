@@ -28,6 +28,7 @@ monster_list = []
 
 current_time = 0.0
 regen_time = 0.0
+death_time = 0.0
 
 monster_count = 30
 
@@ -118,7 +119,7 @@ def collision_skill(a, b):
     return True
 
 def update(frame_time):
-    global regen_time, monster_count
+    global regen_time, monster_count, death_time
     frame_time += get_frame_time()
 
     regen_time += frame_time
@@ -149,9 +150,11 @@ def update(frame_time):
                 pig.pig_nowhp -= character.skill_holly_damage
 
         if pig.pig_nowhp <= 0:
-            character.now_exp += pig.pig_exp
-            if monster_list.count(pig) > 0:
+            death_time += frame_time
+            if monster_list.count(pig) > 0 and death_time > 0.5:
                 monster_list.remove(pig)
+                death_time = 0
+                character.now_exp += pig.pig_exp
 
     for bullet in bullets:
         bullet.update(frame_time)
@@ -160,8 +163,8 @@ def update(frame_time):
                 pig.pig_nowhp -= character.damage
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
-        if bullet.sx > 900:
-            bullets.remove(bullet)
+        # if bullet.sx > 900:
+        #     bullets.remove(bullet)
 
 def draw(frame_time):
     clear_canvas()

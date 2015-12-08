@@ -27,6 +27,7 @@ monster_list = []
 
 current_time = 0.0
 regen_time = 0.0
+death_time = 0.0
 
 monster_count = 30
 
@@ -119,7 +120,7 @@ def collision_skill(a, b):
     return True
 
 def update(frame_time):
-    global regen_time, monster_count
+    global regen_time, monster_count, death_time
     frame_time += get_frame_time()
 
     character.update(frame_time)
@@ -147,15 +148,16 @@ def update(frame_time):
                 mushroom.attack_time = 5
 
         if character.state == character.SKILL_HOLLY_STATE:
-            if collision_skill(character, mushroom):
-                mushroom.Mushroom_nowhp -= character.skill_holly_damage
+                if collision_skill(character, mushroom):
+                        mushroom.Mushroom_nowhp -= character.skill_holly_damage
 
         if mushroom.Mushroom_nowhp <= 0:
-            character.now_exp += mushroom.mushroom_exp
-            if monster_list.count(mushroom) > 0:
+            death_time += frame_time
+            if monster_list.count(mushroom) > 0 and death_time > 0.5:
                 monster_list.remove(mushroom)
-            # if monster_list.count(mushroom) == 0:
-            #     create_mushroom()
+                death_time = 0
+                character.now_exp += mushroom.mushroom_exp
+
 
     for bullet in bullets:
         bullet.update(frame_time)

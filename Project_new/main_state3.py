@@ -29,6 +29,7 @@ monster_list = []
 
 current_time = 0.0
 regen_time = 0.0
+death_time = 0.0
 
 monster_count = 30
 
@@ -113,7 +114,7 @@ def collision_skill(a, b):
     return True
 
 def update(frame_time):
-    global regen_time, monster_count
+    global regen_time, monster_count, death_time
     frame_time += get_frame_time()
 
     regen_time += frame_time
@@ -144,9 +145,11 @@ def update(frame_time):
                 stone.stone_nowhp -= character.skill_holly_damage
 
         if stone.stone_nowhp <= 0:
-            character.now_exp += stone.stone_exp
-            if monster_list.count(stone) > 0:
+            death_time += frame_time
+            if monster_list.count(stone) > 0 and death_time > 0.4:
                 monster_list.remove(stone)
+                death_time = 0
+                character.now_exp += stone.stone_exp
 
     boss.update(frame_time)
 
@@ -160,8 +163,8 @@ def update(frame_time):
         if collision(boss, bullet):
             boss.boss_nowhp -= character.damage
 
-        if bullet.sx > 900:
-            bullets.remove(bullet)
+        # if bullet.sx > 900:
+        #     bullets.remove(bullet)
 
 def draw(frame_time):
     clear_canvas()

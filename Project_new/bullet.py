@@ -37,7 +37,7 @@ class Bullet:
         self.x += speed
         self.total_frame += Bullet.FRAMES_PER_ACTION * Bullet.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % 2
-        self.x = clamp(0, self.x, self.bg.w)
+        self.x = clamp(0, self.x, self.bg.w + 100)
 
     def draw(self):
         self.sx = self.x - self.bg.left

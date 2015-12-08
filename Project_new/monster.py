@@ -9,6 +9,7 @@ my_character = None
 
 class Mushroom:
     image = None
+    death_image = None
     hp_image = None
     hpcell_image = None
 
@@ -38,6 +39,7 @@ class Mushroom:
         self.total_frame = 0
         self.pattern_type = 0
         self.mushroom_exp = 1
+        self.death = False
 
         self.attack_time = 5
 
@@ -53,6 +55,8 @@ class Mushroom:
 
         if Mushroom.image == None:
             Mushroom.image = load_image('resource//Monster/Mushroom.png')
+        if Mushroom.death_image == None:
+            Mushroom.death_image = load_image('resource//Monster/Mushroom_Die.png')
         if Mushroom.hp_image == None:
             Mushroom.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Mushroom.hpcell_image == None:
@@ -75,8 +79,16 @@ class Mushroom:
             if self.x > 800:
                 self.dir = -1
 
+        if self.Mushroom_nowhp <= 0:
+            self.death = True
+            self.distance = 0
+            self.dir = 0
+
     def draw(self):
-        self.image.clip_draw(self.frame * 100, 0, 100, 67, self.x, self.y)
+        if self.death == False:
+            self.image.clip_draw(self.frame * 100, 0, 100, 67, self.x, self.y)
+        else:
+            self.death_image.clip_draw(self.frame * 97, 0, 97, 59, self.x, self.y)
         self.hp_image.clip_draw(0, 0, 104, 12, self.x - 20, self.y - 40)
         for num in range(0, self.draw_hp):
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
@@ -95,6 +107,7 @@ class Mushroom:
 
 class Pig:
     image = None
+    death_image = None
     hp_image = None
     hpcell_image = None
 
@@ -127,6 +140,7 @@ class Pig:
         self.pattern_type = 0
         self.pig_exp = 2
 
+        self.death = False
         self.dir = -1
 
         self.draw_hp = 100
@@ -141,6 +155,8 @@ class Pig:
 
         if Pig.image == None:
             Pig.image = load_image('resource//Monster/Pig.png')
+        if Pig.death_image == None:
+            Pig.death_image = load_image('resource//Monster/Pig_Die.png')
         if Pig.hp_image == None:
             Pig.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Pig.hpcell_image == None:
@@ -163,8 +179,16 @@ class Pig:
             if self.x > 800:
                 self.dir = -1
 
+        if self.pig_nowhp <= 0:
+            self.death = True
+            self.distance = 0
+            self.dir = 0
+
     def draw(self):
-        self.image.clip_draw(self.frame * 100, 0, 100, 50, self.x, self.y)
+        if self.death == False:
+            self.image.clip_draw(self.frame * 100, 0, 100, 50, self.x, self.y)
+        else:
+            self.death_image.clip_draw(self.frame * 92, 0, 92, 56, self.x, self.y)
         self.hp_image.clip_draw(0, 0, 104, 12, self.x - 20, self.y - 40)
         for num in range(0, self.draw_hp):
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
@@ -182,6 +206,7 @@ class Pig:
 
 class Stone:
     image = None
+    death_image = None
     hp_image = None
     hpcell_image = None
 
@@ -214,6 +239,7 @@ class Stone:
         self.pattern_type = 0
         self.stone_exp = 3
 
+        self.death = False
         self.dir = -1
 
         self.draw_hp = 100
@@ -228,6 +254,8 @@ class Stone:
 
         if Stone.image == None:
             Stone.image = load_image('resource/Monster/Stone.png')
+        if Stone.death_image == None:
+            Stone.death_image = load_image('resource/Monster/Stone_Die.png')
         if Stone.hp_image == None:
             Stone.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Stone.hpcell_image == None:
@@ -250,8 +278,16 @@ class Stone:
             if self.x > 800:
                 self.dir = -1
 
+        if self.stone_nowhp <= 0:
+            self.death = True
+            self.distance = 0
+            self.dir = 0
+
     def draw(self):
-        self.image.clip_draw(self.frame * 200, 0, 200, 153, self.x, self.y)
+        if self.death == False:
+            self.image.clip_draw(self.frame * 200, 0, 200, 153, self.x, self.y)
+        else:
+            self.death_image.clip_draw(self.frame * 242, 0, 242, 152, self.x, self.y)
         self.hp_image.clip_draw(0, 0, 104, 12, self.x - 20, self.y - 40)
         for num in range(0, self.draw_hp):
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
@@ -271,6 +307,7 @@ class Boss:
     hp_image = None
     hpcell_image = None
     attack_image = None
+    death_image = None
 
     PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
     RUN_SPEED_KMPH = 20.0                   # km / Hour
