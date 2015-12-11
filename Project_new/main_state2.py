@@ -40,6 +40,8 @@ def enter():
 
     character = Character()
     character.now_exp = converter.character_exp
+    character.level_max_exp = converter.character_maxexp
+    character.draw_exp = int(character.now_exp * (100 / character.level_max_exp))
     character.level = converter.character_level
     character.draw_hp = int(converter.character_nowhp * (100 / converter.character_maxhp))
     character.now_hp = converter.character_nowhp
@@ -84,6 +86,8 @@ def handle_events(frame_time):
             game_framework.quit()
         elif character.x > 800 :
             converter.character_exp = character.now_exp
+            converter.character_maxexp = character.level_max_exp
+            converter.character_drawexp = int(character.now_exp * (100 / character.level_max_exp))
             converter.character_level = character.level
             converter.character_nowhp = character.now_hp
             converter.character_maxhp = character.max_hp

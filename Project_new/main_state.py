@@ -84,6 +84,8 @@ def handle_events(frame_time):
         elif character.x > 1200 :
             converter.character_hp = character.now_hp
             converter.character_exp = character.now_exp
+            converter.character_maxexp = character.level_max_exp
+            converter.character_drawexp = int(character.now_exp * (100 / character.level_max_exp))
             converter.character_level = character.level
             converter.character_nowhp = character.now_hp
             converter.character_maxhp = character.max_hp

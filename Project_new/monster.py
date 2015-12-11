@@ -19,7 +19,7 @@ class Mushroom:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-    TIME_PER_ACTION = 0.5
+    TIME_PER_ACTION = 1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 3
 
@@ -51,7 +51,7 @@ class Mushroom:
         self.Mushroom_nowhp = self.Mushroom_maxhp
         self.Mushroom_attack = 5
 
-        Mushroom.REGEN_TIME = 3
+        Mushroom.REGEN_TIME = 2
 
         if Mushroom.image == None:
             Mushroom.image = load_image('resource//Monster/Mushroom.png')
@@ -117,7 +117,7 @@ class Pig:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-    TIME_PER_ACTION = 0.5
+    TIME_PER_ACTION = 1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 3
 
@@ -151,7 +151,7 @@ class Pig:
         self.pig_nowhp = self.pig_maxhp
         self.pig_attack = 5
 
-        Pig.REGEN_TIME = 5
+        Pig.REGEN_TIME = 3
 
         if Pig.image == None:
             Pig.image = load_image('resource//Monster/Pig.png')
@@ -216,7 +216,7 @@ class Stone:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-    TIME_PER_ACTION = 0.5
+    TIME_PER_ACTION = 1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 3
 
@@ -315,7 +315,7 @@ class Boss:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-    TIME_PER_ACTION = 0.5
+    TIME_PER_ACTION = 1.5
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 3
 
@@ -339,12 +339,13 @@ class Boss:
         self.pattern_type = 0
         self.boss_exp = 2
         self.pattern_type = 1
+        self.attack = False
 
         self.dir = -1
 
         self.draw_hp = 100
 
-        self.attack_time = 50
+        self.attack_time = 100
 
         self.boss_maxhp = 400
         self.boss_nowhp = self.boss_maxhp
@@ -378,22 +379,26 @@ class Boss:
             if self.x > 800:
                 self.dir = -1
 
-        if self.attack_time == 50:
+        if self.attack_time >= 100:
             self.pattern_type *= -1
-            self.attack_time -= self.pattern_type
-        if self.attack_time != 50:
-            self.attack_time -= self.pattern_type
-            if self.attack_time == 0:
+            self.attack_time += self.pattern_type
+        if self.attack_time != 100:
+            self.attack_time += self.pattern_type
+            if self.attack_time <= 0:
                 self.pattern_type *= -1
+                self.attack = True
+        if self.attack_time == 25:
+            self.attack = False
 
-        print(self.attack_time)
+        print("공격 타이밍 : ",self.attack_time)
+        print("현재 시간 : ",Boss.CURRENT_TIME)
 
     def draw(self):
         self.hp_image.clip_draw(0, 0, 406, 36, 400, 500)
         for num in range(0, self.boss_nowhp):
             self.hpcell_image.clip_draw(0, 0, 1, 30, 202 + (num), 500)
 
-        if self.attack_time != 0:
+        if self.attack == True:
             self.attack_image.clip_draw(self.frame * 200, 0, 200, 171, self.x, self.y)
         else:
             self.image.clip_draw(self.frame * 190, 0, 190, 170, self.x, self.y)

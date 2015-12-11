@@ -41,6 +41,8 @@ def enter():
 
     character = Character()
     character.now_exp = converter.character_exp
+    character.level_max_exp = converter.character_maxexp
+    character.draw_exp = int(character.now_exp * (100 / character.level_max_exp))
     character.level = converter.character_level
     character.now_hp = converter.character_nowhp
     character.max_hp = converter.character_maxhp
@@ -151,10 +153,24 @@ def update(frame_time):
                 death_time = 0
                 character.now_exp += stone.stone_exp
 
+    # 보스
     boss.update(frame_time)
+    if character.state == character.SKILL_HOLLY_STATE:
+        if collision_skill(character, boss):
+            boss.boss_nowhp -= character.skill_holly_damage
 
+    if boss.boss_nowhp <= 0:
+        death_time += frame_time
+        if death_time > 0.4:
+            death_time = 0
+
+    # 총알
     for bullet in bullets:
         bullet.update(frame_time)
+        if collision(boss, bullet):
+                boss.boss_nowhp -= character.damage
+                bullets.remove(bullet)
+
         for stone in monster_list:
             if collision(stone, bullet):
                 stone.stone_nowhp -= character.damage
@@ -163,8 +179,6 @@ def update(frame_time):
         if collision(boss, bullet):
             boss.boss_nowhp -= character.damage
 
-        # if bullet.sx > 900:
-        #     bullets.remove(bullet)
 
 def draw(frame_time):
     clear_canvas()
