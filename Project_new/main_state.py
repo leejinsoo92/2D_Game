@@ -153,6 +153,10 @@ def update(frame_time):
                 if collision_skill(character, mushroom):
                         mushroom.Mushroom_nowhp -= character.skill_holly_damage
 
+        if character.state == character.SKILL_LAST_STATE:
+                if collision_skill(character, mushroom):
+                        mushroom.Mushroom_nowhp -= character.skill_last_damage
+
         if mushroom.Mushroom_nowhp <= 0:
             death_time += frame_time
             if monster_list.count(mushroom) > 0 and death_time > 0.5:

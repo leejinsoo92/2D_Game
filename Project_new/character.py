@@ -30,12 +30,12 @@ class Character:
 
     #스킬 이미지
     skill_holly = [None] * 14
-
+    skill_last = [None] * 17
     get_x = 0
 
     DIE_STATE, LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5, 6
 
-    SKILL_HOLLY_STATE = 7
+    SKILL_HOLLY_STATE, SKILL_LAST_STATE = 7, 8
 
     def __init__(self):
         self.canvas_width = get_canvas_width()
@@ -49,6 +49,7 @@ class Character:
         self.state = self.STAND_STATE
         self.total_frame = 0.0
         self.skill_holly_frame = 0.0
+        self.skill_last_frame = 0.0
         self.draw_hp = 100
         self.draw_exp = 0
 
@@ -70,7 +71,9 @@ class Character:
         self.timer = 0
         self.skill_frame = 0
         self.skill_holly_type = False
-        self.skill_holly_damage = 5
+        self.skill_last_type = False
+        self.skill_holly_damage = 4
+        self.skill_last_damage = 10
 
         if Character.stand_image == None:
             Character.stand_image = load_image('resource/Character/Bow_Stand.png')
@@ -113,6 +116,26 @@ class Character:
             Character.skill_holly[11] = load_image('resource/Skill/Skill_Holly/Skill_Holly_12.png')
             Character.skill_holly[12] = load_image('resource/Skill/Skill_Holly/Skill_Holly_13.png')
             Character.skill_holly[13] = load_image('resource/Skill/Skill_Holly/Skill_Holly_14.png')
+
+        if Character.skill_last[0] == None:
+            Character.skill_last[0] = load_image('resource/Skill/Skill_Last/Skill_Last_1.png')
+            Character.skill_last[1] = load_image('resource/Skill/Skill_Last/Skill_Last_2.png')
+            Character.skill_last[2] = load_image('resource/Skill/Skill_Last/Skill_Last_3.png')
+            Character.skill_last[3] = load_image('resource/Skill/Skill_Last/Skill_Last_4.png')
+            Character.skill_last[4] = load_image('resource/Skill/Skill_Last/Skill_Last_5.png')
+            Character.skill_last[5] = load_image('resource/Skill/Skill_Last/Skill_Last_6.png')
+            Character.skill_last[6] = load_image('resource/Skill/Skill_Last/Skill_Last_7.png')
+            Character.skill_last[7] = load_image('resource/Skill/Skill_Last/Skill_Last_8.png')
+            Character.skill_last[8] = load_image('resource/Skill/Skill_Last/Skill_Last_9.png')
+            Character.skill_last[9] = load_image('resource/Skill/Skill_Last/Skill_Last_10.png')
+            Character.skill_last[10] = load_image('resource/Skill/Skill_Last/Skill_Last_11.png')
+            Character.skill_last[11] = load_image('resource/Skill/Skill_Last/Skill_Last_12.png')
+            Character.skill_last[12] = load_image('resource/Skill/Skill_Last/Skill_Last_13.png')
+            Character.skill_last[13] = load_image('resource/Skill/Skill_Last/Skill_Last_14.png')
+            Character.skill_last[14] = load_image('resource/Skill/Skill_Last/Skill_Last_15.png')
+            Character.skill_last[15] = load_image('resource/Skill/Skill_Last/Skill_Last_16.png')
+            Character.skill_last[16] = load_image('resource/Skill/Skill_Last/Skill_Last_17.png')
+
 
     def handle_event(self, event):
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
@@ -163,6 +186,7 @@ class Character:
 
         #skill_holly
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
+            self.skill_holly_frame = 0
             self.skill_frame = 0
             if (self.skill_gauge >= 15):
                 if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE):
@@ -176,6 +200,22 @@ class Character:
                 self.state = self.STAND_STATE
                 self.attack = False
 
+        #skill_last
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
+            self.skill_last_frame = 0
+            self.skill_frame = 0
+            if (self.skill_gauge >= 1):
+                if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE):
+                    self.state = self.SKILL_LAST_STATE
+                    self.skill_last_type = True
+                    self.skill_gauge -= 1
+                    self.attack = True
+
+        elif (event.type, event.key) == (SDL_KEYUP, SDLK_w):
+            if self.state in (self.SKILL_LAST_STATE,):
+                self.state = self.STAND_STATE
+                self.attack = False
+
 
     def update(self, frame_time):
         def clamp(minimum, x, maximum):
@@ -184,6 +224,7 @@ class Character:
         self.distance = Character.RUN_SPEED_PPS * frame_time
         self.total_frame += Character.FRAMES_PER_ACTION * Character.ACTION_PER_TIME * frame_time
         self.skill_holly_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
+        self.skill_last_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
 
         Character.get_x = self.x
 
@@ -214,6 +255,11 @@ class Character:
                 self.skill_holly_type = False
                 # self.skill_frame = 0
 
+        if self.skill_last_type == True:
+            self.skill_frame = int(self.skill_last_frame) % 17
+            if self.skill_frame == 16:
+                self.skill_last_type = False
+
         if self.attack == True:
             self.attack_time += 0.5
             if self.attack_time >= 9:
@@ -221,67 +267,69 @@ class Character:
                 self.attack = False
                 self.state = self.STAND_STATE
 
+        print(self.skill_frame)
+
         # 캐릭터 상태
         if self.level == 2 and self.levelup_type == True:
             self.max_hp = 150
             self.now_hp = self.max_hp
-            self.damage = 2
+            self.damage = 1
             self.level_max_exp = 15
             self.levelup_type = False
 
         elif self.level == 3 and self.levelup_type == True:
             self.max_hp = 200
             self.now_hp = self.max_hp
-            self.damage = 3
+            self.damage = 2
             self.level_max_exp = 20
             self.levelup_type = False
 
         elif self.level == 4 and self.levelup_type == True:
             self.max_hp = 250
             self.now_hp = self.max_hp
-            self.damage = 4
+            self.damage = 2
             self.level_max_exp = 30
             self.levelup_type = False
 
         elif self.level == 5 and self.levelup_type == True:
             self.max_hp = 300
             self.now_hp = self.max_hp
-            self.damage = 5
+            self.damage = 3
             self.level_max_exp = 40
             self.levelup_type = False
 
         elif self.level == 6 and self.levelup_type == True:
             self.max_hp = 350
             self.now_hp = self.max_hp
-            self.damage = 6
+            self.damage = 3
             self.level_max_exp = 50
             self.levelup_type = False
 
         elif self.level == 7 and self.levelup_type == True:
             self.max_hp = 400
             self.now_hp = self.max_hp
-            self.damage = 7
+            self.damage = 4
             self.level_max_exp = 60
             self.levelup_type = False
 
         elif self.level == 8 and self.levelup_type == True:
             self.max_hp = 450
             self.now_hp = self.max_hp
-            self.damage = 8
+            self.damage = 5
             self.level_max_exp = 75
             self.levelup_type = False
 
         elif self.level == 9 and self.levelup_type == True:
             self.max_hp = 500
             self.now_hp = self.max_hp
-            self.damage = 9
+            self.damage = 6
             self.level_max_exp = 90
             self.levelup_type = False
 
         elif self.level == 10 and self.levelup_type == True:
             self.max_hp = 550
             self.now_hp = self.max_hp
-            self.damage = 10
+            self.damage = 7
             self.levelup_type = False
 
         #스킬 게이지 타이머
@@ -316,7 +364,10 @@ class Character:
 
         if self.skill_holly_type == True:
             self.skill_holly[self.skill_frame].clip_draw(0,0, 410,222, self.canvas_width//2+x_offset + 220, self.y + 30)
-            # self.draw_bb_Holly()
+
+        if self.skill_last_type == True:
+            self.skill_last[self.skill_frame].clip_draw(0,0, 520,379, self.canvas_width//2 + 150, 200)
+            self.draw_bb_Last()
 
         # self.skill_holly[10].clip_draw(0,0, 410, 222, self.x, self.y)
 
@@ -461,11 +512,20 @@ class Character:
         x_offset = x_left_offset + x_right_offset
         return self.canvas_width//2+x_offset + 50, self.y - 60, self.canvas_width//2+x_offset + 430, self.y + 80
 
+    def get_bb_Last(self):
+        x_left_offset = min(0,self.x-self.canvas_width//2)
+        x_right_offset = max(0,self.x - self.fl.w + self.canvas_width//2)
+        x_offset = x_left_offset + x_right_offset
+        return self.canvas_width//2 - 30, 70, self.canvas_width//2+ 300, 330
+
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
 
     def draw_bb_Holly(self):
         draw_rectangle(*self.get_bb_Holly())
+
+    def draw_bb_Last(self):
+        draw_rectangle(*self.get_bb_Last())
 
     def getHp(self):
         return self.now_hp

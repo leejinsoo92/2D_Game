@@ -146,6 +146,10 @@ def update(frame_time):
             if collision_skill(character, stone):
                 stone.stone_nowhp -= character.skill_holly_damage
 
+        if character.state == character.SKILL_LAST_STATE:
+                if collision_skill(character, stone):
+                        stone.stone_nowhp -= character.skill_last_damage
+
         if stone.stone_nowhp <= 0:
             death_time += frame_time
             if monster_list.count(stone) > 0 and death_time > 0.4:
@@ -158,6 +162,10 @@ def update(frame_time):
     if character.state == character.SKILL_HOLLY_STATE:
         if collision_skill(character, boss):
             boss.boss_nowhp -= character.skill_holly_damage
+
+    if character.state == character.SKILL_LAST_STATE:
+        if collision_skill(character, boss):
+            boss.boss_nowhp -= character.skill_last_damage
 
     if boss.boss_nowhp <= 0:
         death_time += frame_time

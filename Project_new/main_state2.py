@@ -153,6 +153,10 @@ def update(frame_time):
             if collision_skill(character, pig):
                 pig.pig_nowhp -= character.skill_holly_damage
 
+        if character.state == character.SKILL_LAST_STATE:
+                if collision_skill(character, pig):
+                        pig.pig_nowhp -= character.skill_last_damage
+
         if pig.pig_nowhp <= 0:
             death_time += frame_time
             if monster_list.count(pig) > 0 and death_time > 0.5:
