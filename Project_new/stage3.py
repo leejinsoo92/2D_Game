@@ -20,7 +20,7 @@ class Floor3:
         self.set_center_object = character
 
     def draw(self):
-        self.image.clip_draw_to_origin(self.left,0,800 ,600,0,0)
+        self.image.clip_draw_to_origin(self.left,40,800 ,600,0,0)
 
     def update(self,frame_time):
         self.left = clamp(0,int(self.set_center_object.x ) - self.canvas_width//2, self.w - self.canvas_width)

@@ -15,6 +15,7 @@ class Character:
     HOLLY_FRAMES_PER_ACTION = 1
     HOLLY_ACTION_PER_TIME = 3.0 / TIME_PER_ACTION
 
+    #이미지
     image = None
     attack_image = None
     stand_image = None
@@ -32,6 +33,11 @@ class Character:
     skill_holly = [None] * 14
     skill_last = [None] * 17
     get_x = 0
+
+    #사운드
+    attack_sound = None
+    up_sound = None
+    last_sound = None
 
     DIE_STATE, LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5, 6
 
@@ -55,6 +61,7 @@ class Character:
 
         self.attack = False
         self.levelup_type = False
+        self.die = False
         #캐릭터 상태
         self.level = 1
         self.damage = 1
@@ -69,11 +76,12 @@ class Character:
         #스킬
         self.skill_gauge = 0
         self.timer = 0
-        self.skill_frame = 0
+        self.holly_frame = 0
+        self.last_frame = 0
         self.skill_holly_type = False
         self.skill_last_type = False
-        self.skill_holly_damage = 4
-        self.skill_last_damage = 10
+        self.skill_holly_damage = 5
+        self.skill_last_damage = 20
 
         if Character.stand_image == None:
             Character.stand_image = load_image('resource/Character/Bow_Stand.png')
@@ -136,60 +144,86 @@ class Character:
             Character.skill_last[15] = load_image('resource/Skill/Skill_Last/Skill_Last_16.png')
             Character.skill_last[16] = load_image('resource/Skill/Skill_Last/Skill_Last_17.png')
 
+        #사운드
+        if Character.attack_sound == None:
+            Character.attack_sound = load_wav('resource/Sound/attack_bgm.wav')
+            Character.attack_sound.set_volume(32)
+        if Character.up_sound == None:
+            Character.up_sound = load_wav('resource/Sound/levelup_bgm.wav')
+            Character.up_sound.set_volume(64)
+        if Character.last_sound == None:
+            Character.last_sound = load_wav('resource/Sound/skill_last_bgm.wav')
+            Character.last_sound.set_volume(32)
 
     def handle_event(self, event):
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
             if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.RIGHT_STATE
                 self.dir = 1
+            elif self.state == self.DIE_STATE:
+                self.die = True
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
             if self.state in (self.RIGHT_STATE,):
                 self.state = self.STAND_STATE
                 self.dir = 0
-
+            elif self.state == self.DIE_STATE:
+                self.die = True
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
             if self.state in (self.UP_STATE, self.DOWN_STATE, self.RIGHT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.LEFT_STATE
                 self.dir = -1
+            elif self.state == self.DIE_STATE:
+                self.die = True
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
             if self.state in (self.LEFT_STATE,):
                 self.state = self.STAND_STATE
                 self.dir = 0
-
+            elif self.state == self.DIE_STATE:
+                self.die = True
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
             if self.state in (self.RIGHT_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.UP_STATE
                 self.dir = 0
+            elif self.state == self.DIE_STATE:
+                self.die = True
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_UP):
             if self.state in (self.UP_STATE,):
                 self.state = self.STAND_STATE
-
+            elif self.state == self.DIE_STATE:
+                self.die = True
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
             if self.state in (self.UP_STATE, self.RIGHT_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
                 self.state = self.DOWN_STATE
                 self.dir = 0
+            elif self.state == self.DIE_STATE:
+                self.die = True
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
             if self.state in (self.DOWN_STATE,):
                 self.state = self.STAND_STATE
-
+            elif self.state == self.DIE_STATE:
+                self.die = True
         # 일반 공격
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
             if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE):
                 self.state = self.ATTACK_STATE
                 self.attack = True
                 self.dir = 0
+                self.attack_sound.play()
+            elif self.state == self.DIE_STATE:
+                self.die = True
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_a):
             if self.state in (self.ATTACK_STATE,):
                 self.state = self.STAND_STATE
                 self.attack = False
-
+            elif self.state == self.DIE_STATE:
+                self.die = True
         #skill_holly
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
             self.skill_holly_frame = 0
-            self.skill_frame = 0
+            self.holly_frame = 0
             if (self.skill_gauge >= 15):
-                if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE):
+                if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE, self.SKILL_LAST_STATE):
                     self.state = self.SKILL_HOLLY_STATE
                     self.skill_holly_type = True
                     self.skill_gauge -= 15
@@ -203,19 +237,19 @@ class Character:
         #skill_last
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
             self.skill_last_frame = 0
-            self.skill_frame = 0
-            if (self.skill_gauge >= 1):
-                if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE):
+            self.last_frame = 0
+            if (self.skill_gauge >= 50):
+                if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE, self.SKILL_HOLLY_STATE):
                     self.state = self.SKILL_LAST_STATE
                     self.skill_last_type = True
-                    self.skill_gauge -= 1
+                    self.skill_gauge -= 50
                     self.attack = True
+                    self.last_sound.play()
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_w):
             if self.state in (self.SKILL_LAST_STATE,):
                 self.state = self.STAND_STATE
                 self.attack = False
-
 
     def update(self, frame_time):
         def clamp(minimum, x, maximum):
@@ -223,9 +257,8 @@ class Character:
 
         self.distance = Character.RUN_SPEED_PPS * frame_time
         self.total_frame += Character.FRAMES_PER_ACTION * Character.ACTION_PER_TIME * frame_time
-        self.skill_holly_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
-        self.skill_last_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
-
+        self.holly_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
+        self.last_frame += Character.HOLLY_FRAMES_PER_ACTION * Character.HOLLY_ACTION_PER_TIME * frame_time
         Character.get_x = self.x
 
         self.speed = Character.RUN_SPEED_PPS * frame_time
@@ -247,17 +280,19 @@ class Character:
             elif self.state == self.DOWN_STATE and self.y > 100:
                 self.y -= self.distance
 
-        # if self.skill_holly_type == True:
-        #     self.skill_frame = int(self.total_frame) % 14
+        if self.now_hp <= 0:
+            self.state = self.DIE_STATE
+            self.now_hp = 0
+            self.die = True
+
         if self.skill_holly_type == True:
-            self.skill_frame = int(self.skill_holly_frame) % 14
-            if self.skill_frame == 13:
+            self.skill_holly_frame = int(self.holly_frame) % 14
+            if self.skill_holly_frame == 13:
                 self.skill_holly_type = False
-                # self.skill_frame = 0
 
         if self.skill_last_type == True:
-            self.skill_frame = int(self.skill_last_frame) % 17
-            if self.skill_frame == 16:
+            self.skill_last_frame = int(self.last_frame) % 17
+            if self.skill_last_frame == 16:
                 self.skill_last_type = False
 
         if self.attack == True:
@@ -267,69 +302,70 @@ class Character:
                 self.attack = False
                 self.state = self.STAND_STATE
 
-        print(self.skill_frame)
+        if self.levelup_type == True:
+            self.up_sound.play()
 
         # 캐릭터 상태
         if self.level == 2 and self.levelup_type == True:
             self.max_hp = 150
             self.now_hp = self.max_hp
-            self.damage = 1
+            self.damage = 2
             self.level_max_exp = 15
             self.levelup_type = False
 
         elif self.level == 3 and self.levelup_type == True:
             self.max_hp = 200
             self.now_hp = self.max_hp
-            self.damage = 2
+            self.damage = 3
             self.level_max_exp = 20
             self.levelup_type = False
 
         elif self.level == 4 and self.levelup_type == True:
             self.max_hp = 250
             self.now_hp = self.max_hp
-            self.damage = 2
+            self.damage = 3
             self.level_max_exp = 30
             self.levelup_type = False
 
         elif self.level == 5 and self.levelup_type == True:
             self.max_hp = 300
             self.now_hp = self.max_hp
-            self.damage = 3
+            self.damage = 4
             self.level_max_exp = 40
             self.levelup_type = False
 
         elif self.level == 6 and self.levelup_type == True:
             self.max_hp = 350
             self.now_hp = self.max_hp
-            self.damage = 3
+            self.damage = 5
             self.level_max_exp = 50
             self.levelup_type = False
 
         elif self.level == 7 and self.levelup_type == True:
             self.max_hp = 400
             self.now_hp = self.max_hp
-            self.damage = 4
+            self.damage = 6
             self.level_max_exp = 60
             self.levelup_type = False
 
         elif self.level == 8 and self.levelup_type == True:
             self.max_hp = 450
             self.now_hp = self.max_hp
-            self.damage = 5
+            self.damage = 7
             self.level_max_exp = 75
             self.levelup_type = False
 
         elif self.level == 9 and self.levelup_type == True:
             self.max_hp = 500
             self.now_hp = self.max_hp
-            self.damage = 6
+            self.damage = 8
             self.level_max_exp = 90
             self.levelup_type = False
 
         elif self.level == 10 and self.levelup_type == True:
             self.max_hp = 550
             self.now_hp = self.max_hp
-            self.damage = 7
+            self.damage = 9
             self.levelup_type = False
 
         #스킬 게이지 타이머
@@ -340,44 +376,38 @@ class Character:
             if(self.timer == 11):
                 self.timer = 0
 
-        print(self.now_exp)
-
     def draw(self):
         self.temp = 0
         x_left_offset = min(0,self.x-self.canvas_width//2)
         x_right_offset = max(0,self.x - self.fl.w + self.canvas_width//2)
         x_offset = x_left_offset + x_right_offset
 
-        if self.state == Character.DIE_STATE:
-            self.die_image.clip_draw(0, 0, 101, 47, self.canvas_width//2+x_offset , self.y)
+        if self.die == True:
+            self.die_image.clip_draw(0, 0, 101, 47, self.canvas_width//2+x_offset, self.y)
+        else:
+            if self.attack == False:
+                if self.state == self.STAND_STATE:
+                    self.stand_image.clip_draw(self.stand_frame * 99, 0, 100, 77, self.canvas_width//2+x_offset , self.y)
+                else:
+                    self.image.clip_draw(self.frame * 100, 0, 100, 77, self.canvas_width//2+x_offset, self.y)
+            elif self.attack == True:
+                self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.canvas_width//2+x_offset, self.y)
 
-        if self.attack == False:
-            if self.state == self.STAND_STATE:
-                self.stand_image.clip_draw(self.stand_frame * 99, 0, 100, 77, self.canvas_width//2+x_offset , self.y)
-            else:
-                self.image.clip_draw(self.frame * 100, 0, 100, 77, self.canvas_width//2+x_offset, self.y)
-        elif self.attack == True:
-            self.attack_image.clip_draw(self.attack_frame * 99, 0, 99, 77, self.canvas_width//2+x_offset, self.y)
-
-        # if self.skill_holly_type == True:
-        #     self.skill_holly.clip_draw(self.skill_frame * 450,0, 450,214, self.canvas_width//2+x_offset + 220, self.y + 30)
+            self.skill_bar.clip_draw(0, 0, 104, 12, self.canvas_width//2+x_offset - 15, self.y - 50)
+            #스킬 게이지
+            for i in range(0,self.skill_gauge):
+                self.skill_cell.clip_draw( 0, 0, 1, 10, self.canvas_width//2+x_offset - 65 + i, self.y - 50)
 
         if self.skill_holly_type == True:
-            self.skill_holly[self.skill_frame].clip_draw(0,0, 410,222, self.canvas_width//2+x_offset + 220, self.y + 30)
+            self.skill_holly[self.skill_holly_frame].clip_draw(0,0, 410,222, self.canvas_width//2+x_offset + 200, self.y + 30)
 
         if self.skill_last_type == True:
-            self.skill_last[self.skill_frame].clip_draw(0,0, 520,379, self.canvas_width//2 + 150, 200)
+            self.skill_last[self.skill_last_frame].clip_draw(0,0, 520,379, self.canvas_width//2 + 150, 200)
             self.draw_bb_Last()
-
-        # self.skill_holly[10].clip_draw(0,0, 410, 222, self.x, self.y)
 
         self.hpbar_image.clip_draw( 0, 0, 206, 36, 350, 25)
         self.expbar_image.clip_draw(0, 0, 206, 36, 600, 25)
-        self.skill_bar.clip_draw(0, 0, 104, 12, self.canvas_width//2+x_offset - 15, self.y - 50)
 
-        #스킬 게이지
-        for i in range(0,self.skill_gauge):
-            self.skill_cell.clip_draw( 0, 0, 1, 10, self.canvas_width//2+x_offset - 65 + i, self.y - 50)
         # 레벨
         if self.level == 1:
             for i in range(0, self.now_hp) :
@@ -401,13 +431,6 @@ class Character:
                     self.now_exp = 0
                     self.level = 3
                     self.levelup_type = True
-
-            # for i in range(0, self.now_exp) :
-            #     self.exp_image.clip_draw( 0, 0, 20, 30, 600 - 90 + (i * 20), 25)
-            #     if self.now_exp >= self.level_max_exp:
-            #         self.now_exp = 0
-            #         self.level = 3
-            #         self.levelup_type = True
 
         if self.level == 3:
             for i in range(0, self.draw_hp) :
@@ -498,7 +521,8 @@ class Character:
                 self.character_hp_image.clip_draw( 0, 0, 2, 30, 350 - 99 + (i * 2), 25)
                 self.draw_hp = int(self.now_hp * (100 / self.max_hp))
 
-        self.draw_bb()
+    def die(self):
+        self.die = True
 
     def get_bb(self):
         x_left_offset = min(0,self.x-self.canvas_width//2)

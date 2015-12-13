@@ -85,6 +85,7 @@ class Floor:
     def draw(self):
         self.image.clip_draw_to_origin(self.left,0,800 ,235,0,0)
         self.image_next.clip_draw(self.frame * 100, 0, 100, 44, 800, 200)
+
     def update(self,frame_time):
         self.left = clamp(0,int(self.set_center_object.x ) - self.canvas_width//2, self.w - self.canvas_width)
         self.total_frame += Floor.FRAMES_PER_ACTION * Floor.ACTION_PER_TIME * frame_time

@@ -122,6 +122,17 @@ def collision_skill(a, b):
 
     return True
 
+def collision_skill_last(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb_Last()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+
+    if left_a > right_b : return False
+    if right_a < left_b : return False
+    if top_a < bottom_b : return False
+    if bottom_a > top_b : return False
+
+    return True
+
 def update(frame_time):
     global regen_time, monster_count, death_time
     frame_time += get_frame_time()
@@ -141,7 +152,7 @@ def update(frame_time):
     for pig in monster_list:
         pig.update(frame_time)
         if pig.attack_time == 4:
-            if collision(character,pig):
+            if collision(character,pig) and character.state != character.DIE_STATE:
                 character.now_hp -= pig.pig_attack
                 pig.attack_time -= 1
         if pig.attack_time != 4:
@@ -151,11 +162,11 @@ def update(frame_time):
 
         if character.state == character.SKILL_HOLLY_STATE:
             if collision_skill(character, pig):
-                pig.pig_nowhp -= character.skill_holly_damage
+                pig.hit(character.skill_holly_damage)
 
         if character.state == character.SKILL_LAST_STATE:
-                if collision_skill(character, pig):
-                        pig.pig_nowhp -= character.skill_last_damage
+            if collision_skill_last(character, pig):
+                pig.hit(character.skill_last_damage)
 
         if pig.pig_nowhp <= 0:
             death_time += frame_time
@@ -168,7 +179,7 @@ def update(frame_time):
         bullet.update(frame_time)
         for pig in monster_list:
             if collision(pig, bullet):
-                pig.pig_nowhp -= character.damage
+                pig.hit(character.damage)
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
         # if bullet.sx > 900:

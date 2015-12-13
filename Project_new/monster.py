@@ -25,12 +25,14 @@ class Mushroom:
 
     REGEN_TIME = 0
 
+    hit_sound = None
+
     LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
 
     def __init__(self):
         global my_character
         my_character = Character()
-        self.x, self.y = 900, random.randint(100,300)
+        self.x, self.y = 900, random.randint(80,300)
         self.frame = random.randint(0, 7)
         self.run_frames = 0
         self.stand_frames = 0
@@ -61,6 +63,10 @@ class Mushroom:
             Mushroom.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Mushroom.hpcell_image == None:
             Mushroom.hpcell_image = load_image('resource/UI/Monster_HpCell_1.png')
+
+        if Mushroom.hit_sound == None:
+            Mushroom.hit_sound = load_wav('resource/Sound/monster_hit_bgm.wav')
+            Mushroom.hit_sound.set_volume(32)
 
     def update(self,frame_time):
         self.distance = Mushroom.RUN_SPEED_PPS * frame_time
@@ -94,8 +100,9 @@ class Mushroom:
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
             self.draw_hp = self.Mushroom_nowhp * 10
 
-
-        # self.draw_bb()
+    def hit(self, attack):
+        self.Mushroom_nowhp -= attack
+        self.hit_sound.play()
 
     def get_bb(self):
         return self.x - 40, self.y - 30, self.x + 10, self.y + 30
@@ -110,6 +117,7 @@ class Pig:
     death_image = None
     hp_image = None
     hpcell_image = None
+    hit_sound = None
 
     PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
     RUN_SPEED_KMPH = 20.0                   # km / Hour
@@ -129,7 +137,7 @@ class Pig:
     def __init__(self):
         global my_character
         my_character = Character()
-        self.x, self.y = 900, random.randint(100,300)
+        self.x, self.y = 900, random.randint(80,300)
         self.frame = random.randint(0, 7)
         self.run_frames = 0
         self.stand_frames = 0
@@ -138,7 +146,7 @@ class Pig:
         self.total_frame = 0
         self.live_flag = 0
         self.pattern_type = 0
-        self.pig_exp = 2
+        self.pig_exp = 3
 
         self.death = False
         self.dir = -1
@@ -161,6 +169,9 @@ class Pig:
             Pig.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Pig.hpcell_image == None:
             Pig.hpcell_image = load_image('resource/UI/Monster_HpCell_1.png')
+        if Pig.hit_sound == None:
+            Pig.hit_sound = load_wav('resource/Sound/monster_hit_bgm.wav')
+            Pig.hit_sound.set_volume(32)
 
     def update(self,frame_time):
         self.distance = Pig.RUN_SPEED_PPS * frame_time
@@ -194,8 +205,9 @@ class Pig:
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
             self.draw_hp = int(self.pig_nowhp * 10 / 3 )
 
-
-        # self.draw_bb()
+    def hit(self, attack):
+        self.pig_nowhp -= attack
+        self.hit_sound.play()
 
     def get_bb(self):
         return self.x - 40, self.y - 30, self.x + 10, self.y + 30
@@ -209,6 +221,7 @@ class Stone:
     death_image = None
     hp_image = None
     hpcell_image = None
+    hit_sound = None
 
     PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
     RUN_SPEED_KMPH = 20.0                   # km / Hour
@@ -228,7 +241,7 @@ class Stone:
     def __init__(self):
         global my_character
         my_character = Character()
-        self.x, self.y = 900, random.randint(100,300)
+        self.x, self.y = 900, random.randint(80,300)
         self.frame = random.randint(0, 7)
         self.run_frames = 0
         self.stand_frames = 0
@@ -237,7 +250,7 @@ class Stone:
         self.total_frame = 0
         self.live_flag = 0
         self.pattern_type = 0
-        self.stone_exp = 3
+        self.stone_exp = 5
 
         self.death = False
         self.dir = -1
@@ -260,6 +273,9 @@ class Stone:
             Stone.hp_image = load_image('resource/UI/Monster_HpBar.png')
         if Stone.hpcell_image == None:
             Stone.hpcell_image = load_image('resource/UI/Monster_HpCell_1.png')
+        if Stone.hit_sound == None:
+            Stone.hit_sound = load_wav('resource/Sound/monster_hit_bgm.wav')
+            Stone.hit_sound.set_volume(32)
 
     def update(self,frame_time):
         self.distance = Stone.RUN_SPEED_PPS * frame_time
@@ -293,8 +309,9 @@ class Stone:
             self.hpcell_image.clip_draw(0, 0, 1, 10, self.x - 70 + (num), self.y - 40)
             self.draw_hp = int( self.stone_nowhp * 10 / 6)
 
-
-        self.draw_bb()
+    def hit(self, attack):
+        self.stone_nowhp -= attack
+        self.hit_sound.play()
 
     def get_bb(self):
         return self.x - 60, self.y - 40, self.x + 30, self.y + 40
@@ -308,6 +325,7 @@ class Boss:
     hpcell_image = None
     attack_image = None
     death_image = None
+    hit_sound = None
 
     PIXEL_PER_METER = (10.0 / 0.8 )         # 10 pixel 30cm
     RUN_SPEED_KMPH = 20.0                   # km / Hour
@@ -320,7 +338,7 @@ class Boss:
     FRAMES_PER_ACTION = 3
 
 
-    LEFT_RUN, RIGHT_RUN, UP_MOVE, DOWN_MOVE = 0, 1, 2, 3
+    MOVE_STATE, ATTACK_STATE = 0, 1
 
     REGEN_TIME = 0
     CURRENT_TIME = 0.0
@@ -328,12 +346,12 @@ class Boss:
     def __init__(self):
         global my_character
         my_character = Character()
-        self.x, self.y = 800, random.randint(100,300)
+        self.x, self.y = 700, random.randint(100,300)
         self.frame = random.randint(0, 7)
         self.run_frames = 0
         self.stand_frames = 0
         self.speed = 5
-        self.state = self.LEFT_RUN
+        self.state = self.MOVE_STATE
         self.total_frame = 0
         self.live_flag = 0
         self.pattern_type = 0
@@ -345,7 +363,7 @@ class Boss:
 
         self.draw_hp = 100
 
-        self.attack_time = 100
+        self.attack_time = 50
 
         self.boss_maxhp = 400
         self.boss_nowhp = self.boss_maxhp
@@ -361,6 +379,9 @@ class Boss:
             Boss.hp_image = load_image('resource/UI/Boss_HpBar.png')
         if Boss.hpcell_image == None:
             Boss.hpcell_image = load_image('resource/UI/Boss_HpCell.png')
+        if Boss.hit_sound == None:
+            Boss.hit_sound = load_wav('resource/Sound/monster_hit_bgm.wav')
+            Boss.hit_sound.set_volume(32)
 
     def update(self,frame_time):
         self.distance = Boss.RUN_SPEED_PPS * frame_time
@@ -368,27 +389,27 @@ class Boss:
         self.frame = int(self.total_frame) % 3
 
         if self.dir == -1:
-            self.state = self.LEFT_RUN
-            self.x -= self.distance
-            if self.x < 500:
+            self.y += self.distance
+            if self.y > 320:
                 self.dir = 1
 
         elif self.dir == 1:
-            self.state = self.RIGHT_RUN
-            self.x += self.distance
-            if self.x > 800:
+            self.y -= self.distance
+            if self.y < 80:
                 self.dir = -1
 
-        if self.attack_time >= 100:
+        if self.attack_time >= 50:
             self.pattern_type *= -1
             self.attack_time += self.pattern_type
-        if self.attack_time != 100:
+        if self.attack_time != 50:
             self.attack_time += self.pattern_type
             if self.attack_time <= 0:
                 self.pattern_type *= -1
                 self.attack = True
+                self.state = self.ATTACK_STATE
         if self.attack_time == 25:
             self.attack = False
+            self.state = self.MOVE_STATE
 
         print("공격 타이밍 : ",self.attack_time)
         print("현재 시간 : ",Boss.CURRENT_TIME)
@@ -405,6 +426,9 @@ class Boss:
 
         self.draw_bb()
 
+    def hit(self, attack):
+        self.boss_nowhp -= attack
+        self.hit_sound.play()
 
     def get_frame_time(self):
         frame_time = get_time() - Boss.CURRENT_TIME

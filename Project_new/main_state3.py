@@ -22,6 +22,7 @@ name = "Second_State"
 character = None
 stone = None
 bullet = None
+boss_ball = None
 stage_2 = None
 font = None
 
@@ -34,7 +35,7 @@ death_time = 0.0
 monster_count = 30
 
 def enter():
-    global character, bullets, font,state_3, boss
+    global character, bullets, font,state_3, boss, boss_balls
     global current_time
 
     current_time = get_time()
@@ -52,6 +53,7 @@ def enter():
     boss = Boss()
     state_3 = Floor3()
     bullets = list()
+    boss_balls = list()
 
     state_3.set_center_object(character)
     character.set_floor(state_3)
@@ -74,6 +76,10 @@ def resume():
 def fire():
     global bullets
     bullets.append(Bullet(character.x, character.y,state_3))
+
+def boss_fire():
+    global boss_balls
+    boss_balls.append(BossBullet(boss.x, boss.y, state_3))
 
 def get_frame_time():
     global current_time
@@ -115,6 +121,17 @@ def collision_skill(a, b):
 
     return True
 
+def collision_skill_last(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb_Last()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+
+    if left_a > right_b : return False
+    if right_a < left_b : return False
+    if top_a < bottom_b : return False
+    if bottom_a > top_b : return False
+
+    return True
+
 def update(frame_time):
     global regen_time, monster_count, death_time
     frame_time += get_frame_time()
@@ -134,7 +151,7 @@ def update(frame_time):
     for stone in monster_list:
         stone.update(frame_time)
         if stone.attack_time == 4:
-            if collision(character,stone):
+            if collision(character,stone) and character.state != character.DIE_STATE:
                 character.now_hp -= stone.stone_attack
                 stone.attack_time -= 1
         if stone.attack_time != 4:
@@ -144,11 +161,11 @@ def update(frame_time):
 
         if character.state == character.SKILL_HOLLY_STATE:
             if collision_skill(character, stone):
-                stone.stone_nowhp -= character.skill_holly_damage
+                stone.hit(character.skill_holly_damage)
 
         if character.state == character.SKILL_LAST_STATE:
-                if collision_skill(character, stone):
-                        stone.stone_nowhp -= character.skill_last_damage
+            if collision_skill_last(character, stone):
+                stone.hit(character.skill_last_damage)
 
         if stone.stone_nowhp <= 0:
             death_time += frame_time
@@ -161,31 +178,39 @@ def update(frame_time):
     boss.update(frame_time)
     if character.state == character.SKILL_HOLLY_STATE:
         if collision_skill(character, boss):
-            boss.boss_nowhp -= character.skill_holly_damage
+            boss.hit(int(character.skill_holly_damage/4))
 
     if character.state == character.SKILL_LAST_STATE:
-        if collision_skill(character, boss):
-            boss.boss_nowhp -= character.skill_last_damage
+        if collision_skill_last(character, boss):
+            boss.hit(int(character.skill_last_damage/4))
 
     if boss.boss_nowhp <= 0:
         death_time += frame_time
         if death_time > 0.4:
             death_time = 0
 
+    if boss.state == boss.ATTACK_STATE:
+        boss_fire()
+    for boss_ball in boss_balls:
+        boss_ball.update(frame_time)
+        if collision(character, boss_ball):
+            character.now_hp -= boss.boss_attack
+            boss_balls.remove(boss_ball)
+
     # 총알
     for bullet in bullets:
         bullet.update(frame_time)
         if collision(boss, bullet):
-                boss.boss_nowhp -= character.damage
-                bullets.remove(bullet)
+            boss.hit(character.damage)
+            bullets.remove(bullet)
 
         for stone in monster_list:
             if collision(stone, bullet):
-                stone.stone_nowhp -= character.damage
+                stone.hit(character.damage)
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
         if collision(boss, bullet):
-            boss.boss_nowhp -= character.damage
+            boss.boss_nowhp -= int(character.damage / 4)
 
 
 def draw(frame_time):
@@ -198,6 +223,8 @@ def draw(frame_time):
         stone.draw()
     for bullet in bullets:
         bullet.draw()
+    for boss_ball in boss_balls:
+        boss_ball.draw()
 
     font.draw(250,60,'HP:%d'%(character.getHp()))
     font.draw(20,30,'LEVEL:%d'%(character.getLevel()))

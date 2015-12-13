@@ -14,7 +14,6 @@ def enter():
     game_framework.reset_time()
     image = load_image('resource/title/kpu_credit.png')
 
-
 def exit():
     global image
     del(image)

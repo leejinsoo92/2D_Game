@@ -30,24 +30,25 @@ regen_time = 0.0
 death_time = 0.0
 
 monster_count = 30
+holly_time = 0.0
+sound = None
 
 def enter():
-    global character, background, bullets, font, floor
+    global character, background, bullets, font, floor, sound
     global current_time
 
     current_time = get_time()
 
     character = Character()
-    # character.now_hp = converter.character_hp
-    # character.now_exp = converter.character_exp
-    # character.level = converter.character_level
-
     background = Background(850, 700)
     floor = Floor()
     bullets = list()
     floor.set_center_object(character)
     character.set_floor(floor)
 
+    if sound == None:
+        sound = load_music('resource/Sound/stage_1.mp3')
+    sound.play()
     font = load_font('resource/UI/ENCR10B.TTF',40)
 
 def exit():
@@ -121,8 +122,19 @@ def collision_skill(a, b):
 
     return True
 
+def collision_skill_last(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb_Last()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+
+    if left_a > right_b : return False
+    if right_a < left_b : return False
+    if top_a < bottom_b : return False
+    if bottom_a > top_b : return False
+
+    return True
+
 def update(frame_time):
-    global regen_time, monster_count, death_time
+    global regen_time, monster_count, death_time, holly_time, test
     frame_time += get_frame_time()
 
     character.update(frame_time)
@@ -141,7 +153,7 @@ def update(frame_time):
     for mushroom in monster_list:
         mushroom.update(frame_time)
         if mushroom.attack_time == 5:
-            if collision(character,mushroom):
+            if collision(character,mushroom) and character.state != character.DIE_STATE:
                 character.now_hp -= mushroom.Mushroom_attack
                 mushroom.attack_time -= 1
         if mushroom.attack_time != 5:
@@ -150,12 +162,12 @@ def update(frame_time):
                 mushroom.attack_time = 5
 
         if character.state == character.SKILL_HOLLY_STATE:
-                if collision_skill(character, mushroom):
-                        mushroom.Mushroom_nowhp -= character.skill_holly_damage
+            if collision_skill(character, mushroom):
+                mushroom.hit(character.skill_holly_damage)
 
         if character.state == character.SKILL_LAST_STATE:
-                if collision_skill(character, mushroom):
-                        mushroom.Mushroom_nowhp -= character.skill_last_damage
+            if collision_skill_last(character, mushroom):
+                mushroom.hit(character.skill_last_damage)
 
         if mushroom.Mushroom_nowhp <= 0:
             death_time += frame_time
@@ -169,7 +181,7 @@ def update(frame_time):
         bullet.update(frame_time)
         for mushroom in monster_list:
             if collision(mushroom, bullet):
-                mushroom.Mushroom_nowhp -= character.damage
+                mushroom.hit(character.damage)
                 if bullets.count(bullet) > 0:
                     bullets.remove(bullet)
         if bullet.sx > 1000:
