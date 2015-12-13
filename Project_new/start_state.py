@@ -6,14 +6,15 @@ from pico2d import *
 name = "StartState"
 image = None
 logo_time = 0.0
-
+title_sound = None
 
 def enter():
-    global image
+    global image, title_sound
     open_canvas()
     game_framework.reset_time()
     image = load_image('resource/title/kpu_credit.png')
-
+    title_sound = load_music('resource/Sound/title.mp3')
+    title_sound.play()
 def exit():
     global image
     del(image)

@@ -10,6 +10,8 @@ from bullet import *
 from pico2d import *
 from monster import Stone
 from monster import Boss
+import GameOver
+import GameClear
 
 import converter
 import game_framework
@@ -20,11 +22,13 @@ import main_state3
 name = "Second_State"
 
 character = None
+boss = None
 stone = None
 bullet = None
 boss_ball = None
 stage_2 = None
 font = None
+sound = None
 
 monster_list = []
 
@@ -35,7 +39,7 @@ death_time = 0.0
 monster_count = 30
 
 def enter():
-    global character, bullets, font,state_3, boss, boss_balls
+    global character, bullets, font,state_3, boss, boss_balls, sound
     global current_time
 
     current_time = get_time()
@@ -49,23 +53,29 @@ def enter():
     character.max_hp = converter.character_maxhp
     character.draw_hp = int(converter.character_nowhp * (100 / converter.character_maxhp))
     character.damage = converter.chracter_damage
+    character.skill_gauge = converter.skill_gauge
 
     boss = Boss()
     state_3 = Floor3()
     bullets = list()
     boss_balls = list()
 
+    #사운드
+    sound = load_music('resource/Sound/stage_3.mp3')
+    sound.set_volume(64)
+    sound.repeat_play()
+
     state_3.set_center_object(character)
     character.set_floor(state_3)
     font = load_font('resource/UI/ENCR10B.TTF',40)
 
 def exit():
-    global character, state_3, font, boss
+    global character, state_3, font#, boss
 
-    del(character)
+    #del(character)
     del(state_3)
     del(font)
-    del(boss)
+    #del(boss)
 
 def pause():
     pass
@@ -133,7 +143,7 @@ def collision_skill_last(a, b):
     return True
 
 def update(frame_time):
-    global regen_time, monster_count, death_time
+    global regen_time, monster_count, death_time, boss, character
     frame_time += get_frame_time()
 
     regen_time += frame_time
@@ -167,7 +177,7 @@ def update(frame_time):
             if collision_skill_last(character, stone):
                 stone.hit(character.skill_last_damage)
 
-        if stone.stone_nowhp <= 0:
+        if stone.stone_nowhp <= 0 or boss.boss_nowhp <= 0:
             death_time += frame_time
             if monster_list.count(stone) > 0 and death_time > 0.4:
                 monster_list.remove(stone)
@@ -175,7 +185,9 @@ def update(frame_time):
                 character.now_exp += stone.stone_exp
 
     # 보스
-    boss.update(frame_time)
+    if boss.death == False:
+        boss.update(frame_time)
+
     if character.state == character.SKILL_HOLLY_STATE:
         if collision_skill(character, boss):
             boss.hit(int(character.skill_holly_damage/4))
@@ -186,11 +198,14 @@ def update(frame_time):
 
     if boss.boss_nowhp <= 0:
         death_time += frame_time
-        if death_time > 0.4:
+        if death_time > 1.0:
             death_time = 0
+            sound.stop()
+            game_framework.change_state(GameClear)
 
-    if boss.state == boss.ATTACK_STATE:
+    if boss.state == boss.ATTACK_STATE and boss.death == False:
         boss_fire()
+
     for boss_ball in boss_balls:
         boss_ball.update(frame_time)
         if collision(character, boss_ball):
@@ -212,6 +227,10 @@ def update(frame_time):
         if collision(boss, bullet):
             boss.boss_nowhp -= int(character.damage / 4)
 
+    if character.now_hp <= 0:
+        sound.stop()
+        game_framework.change_state(GameOver)
+
 
 def draw(frame_time):
     clear_canvas()
@@ -223,8 +242,10 @@ def draw(frame_time):
         stone.draw()
     for bullet in bullets:
         bullet.draw()
-    for boss_ball in boss_balls:
-        boss_ball.draw()
+
+    if boss.death == False:
+        for boss_ball in boss_balls:
+            boss_ball.draw()
 
     font.draw(250,60,'HP:%d'%(character.getHp()))
     font.draw(20,30,'LEVEL:%d'%(character.getLevel()))

@@ -12,7 +12,7 @@ import converter
 import game_framework
 import title_state
 import main_state2
-
+import GameOver
 # from monster import Mushroom
 
 name = "MainState"
@@ -46,9 +46,10 @@ def enter():
     floor.set_center_object(character)
     character.set_floor(floor)
 
-    if sound == None:
-        sound = load_music('resource/Sound/stage_1.mp3')
-    sound.play()
+    #사운드
+    sound = load_music('resource/Sound/stage_1.mp3')
+    sound.set_volume(128)
+    sound.repeat_play()
     font = load_font('resource/UI/ENCR10B.TTF',40)
 
 def exit():
@@ -80,8 +81,6 @@ def handle_events(frame_time):
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_state(title_state)
         elif character.x > 1200 :
             converter.character_hp = character.now_hp
             converter.character_exp = character.now_exp
@@ -92,6 +91,7 @@ def handle_events(frame_time):
             converter.character_maxhp = character.max_hp
             converter.character_drawhp = int(character.now_hp * (100 / character.max_hp))
             converter.chracter_damage = character.damage
+            converter.skill_gauge = character.skill_gauge
             game_framework.change_state(main_state2)
         else:
             character.handle_event(event)
@@ -186,6 +186,10 @@ def update(frame_time):
                     bullets.remove(bullet)
         if bullet.sx > 1000:
             bullets.remove(bullet)
+
+    if character.now_hp <= 0:
+        sound.stop()
+        game_framework.change_state(GameOver)
 
 def draw(frame_time):
     clear_canvas()

@@ -1,7 +1,6 @@
 import game_framework
-import main_state
-import main_state3
-import logo_state
+
+import logo2_state
 from pico2d import *
 
 
@@ -11,8 +10,8 @@ title_time = 0
 
 def enter():
     global  image, title_sound
-    image = load_image('resource/title/Main_Logo.png')
-
+    image = load_image('resource/title/Logo_1.jpg')
+    
 def exit():
     global image
     del(image)
@@ -27,7 +26,7 @@ def handle_events(frame_time):
             if( event.type , event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 game_framework.quit()
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
-                game_framework.change_state(logo_state)
+                game_framework.change_state(logo2_state)
 
 
 def draw(frame_time):

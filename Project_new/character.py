@@ -38,6 +38,7 @@ class Character:
     attack_sound = None
     up_sound = None
     last_sound = None
+    holly_sound = None
 
     DIE_STATE, LEFT_STATE, RIGHT_STATE, UP_STATE, DOWN_STATE, ATTACK_STATE ,STAND_STATE = 0 ,1 ,2, 3, 4, 5, 6
 
@@ -153,71 +154,64 @@ class Character:
             Character.up_sound.set_volume(64)
         if Character.last_sound == None:
             Character.last_sound = load_wav('resource/Sound/skill_last_bgm.wav')
-            Character.last_sound.set_volume(32)
+            Character.last_sound.set_volume(64)
+        if Character.holly_sound == None:
+            Character.holly_sound = load_wav('resource/Sound/holly_1.wav')
+            Character.holly_sound.set_volume(64)
 
     def handle_event(self, event):
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
-            if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+            if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.STAND_STATE):
                 self.state = self.RIGHT_STATE
                 self.dir = 1
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
             if self.state in (self.RIGHT_STATE,):
                 self.state = self.STAND_STATE
                 self.dir = 0
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
-            if self.state in (self.UP_STATE, self.DOWN_STATE, self.RIGHT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+            if self.state in (self.UP_STATE, self.DOWN_STATE, self.RIGHT_STATE, self.STAND_STATE):
                 self.state = self.LEFT_STATE
                 self.dir = -1
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
             if self.state in (self.LEFT_STATE,):
                 self.state = self.STAND_STATE
                 self.dir = 0
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
-            if self.state in (self.RIGHT_STATE, self.DOWN_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+            if self.state in (self.RIGHT_STATE, self.DOWN_STATE, self.LEFT_STATE, self.STAND_STATE):
                 self.state = self.UP_STATE
                 self.dir = 0
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_UP):
             if self.state in (self.UP_STATE,):
                 self.state = self.STAND_STATE
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
-            if self.state in (self.UP_STATE, self.RIGHT_STATE, self.LEFT_STATE, self.ATTACK_STATE, self.STAND_STATE):
+            if self.state in (self.UP_STATE, self.RIGHT_STATE, self.LEFT_STATE, self.STAND_STATE):
                 self.state = self.DOWN_STATE
                 self.dir = 0
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
             if self.state in (self.DOWN_STATE,):
                 self.state = self.STAND_STATE
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         # 일반 공격
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
-            if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE):
+            # if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE):
                 self.state = self.ATTACK_STATE
                 self.attack = True
                 self.dir = 0
                 self.attack_sound.play()
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_a):
-            if self.state in (self.ATTACK_STATE,):
+            # if self.state in (self.ATTACK_STATE,):
                 self.state = self.STAND_STATE
                 self.attack = False
-            elif self.state == self.DIE_STATE:
-                self.die = True
+
         #skill_holly
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
             self.skill_holly_frame = 0
@@ -228,6 +222,7 @@ class Character:
                     self.skill_holly_type = True
                     self.skill_gauge -= 15
                     self.attack = True
+                    self.holly_sound.play()
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_q):
             if self.state in (self.SKILL_HOLLY_STATE,):
@@ -238,11 +233,11 @@ class Character:
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
             self.skill_last_frame = 0
             self.last_frame = 0
-            if (self.skill_gauge >= 50):
+            if (self.skill_gauge >= 1):
                 if self.state in (self.UP_STATE, self.DOWN_STATE, self.LEFT_STATE, self.RIGHT_STATE, self.STAND_STATE, self.ATTACK_STATE, self.SKILL_HOLLY_STATE):
                     self.state = self.SKILL_LAST_STATE
                     self.skill_last_type = True
-                    self.skill_gauge -= 50
+                    self.skill_gauge -= 1
                     self.attack = True
                     self.last_sound.play()
 
@@ -263,7 +258,7 @@ class Character:
 
         self.speed = Character.RUN_SPEED_PPS * frame_time
         self.x += (self.dir * self.speed)
-        self.x = clamp(0, self.x, self.fl.w)
+        self.x = clamp(60, self.x, self.fl.w)
 
         self.draw_exp = int(self.now_exp * (100 / self.level_max_exp))
 
@@ -372,7 +367,9 @@ class Character:
         if(self.timer != 11):
             self.timer += 1
             if self.timer == 10 and self.skill_gauge != 100:
-                self.skill_gauge += 1
+                self.skill_gauge += 2
+            if self.skill_gauge >= 100:
+                self.skill_gauge = 100
             if(self.timer == 11):
                 self.timer = 0
 
@@ -403,7 +400,6 @@ class Character:
 
         if self.skill_last_type == True:
             self.skill_last[self.skill_last_frame].clip_draw(0,0, 520,379, self.canvas_width//2 + 150, 200)
-            self.draw_bb_Last()
 
         self.hpbar_image.clip_draw( 0, 0, 206, 36, 350, 25)
         self.expbar_image.clip_draw(0, 0, 206, 36, 600, 25)

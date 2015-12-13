@@ -358,6 +358,7 @@ class Boss:
         self.boss_exp = 2
         self.pattern_type = 1
         self.attack = False
+        self.death = False
 
         self.dir = -1
 
@@ -375,6 +376,8 @@ class Boss:
             Boss.image = load_image('resource/Boss/Boss_1.png')
         if Boss.attack_image == None:
             Boss.attack_image = load_image('resource/Boss/Boss_1_Attack.png')
+        if Boss.death_image == None:
+            Boss.death_image = load_image('resource/Boss/Boss_1_Die.png')
         if Boss.hp_image == None:
             Boss.hp_image = load_image('resource/UI/Boss_HpBar.png')
         if Boss.hpcell_image == None:
@@ -411,20 +414,25 @@ class Boss:
             self.attack = False
             self.state = self.MOVE_STATE
 
-        print("공격 타이밍 : ",self.attack_time)
-        print("현재 시간 : ",Boss.CURRENT_TIME)
+        if self.boss_nowhp <= 0:
+            self.death = True
+            self.attack = False
+            self.attack_time = 0
+            self.distance = 0
+            self.dir = 0
 
     def draw(self):
         self.hp_image.clip_draw(0, 0, 406, 36, 400, 500)
         for num in range(0, self.boss_nowhp):
             self.hpcell_image.clip_draw(0, 0, 1, 30, 202 + (num), 500)
 
-        if self.attack == True:
-            self.attack_image.clip_draw(self.frame * 200, 0, 200, 171, self.x, self.y)
+        if self.death == True:
+            self.death_image.clip_draw(self.frame * 260, 0, 260, 162, self.x, self.y)
         else:
-            self.image.clip_draw(self.frame * 190, 0, 190, 170, self.x, self.y)
-
-        self.draw_bb()
+            if self.attack == True:
+                self.attack_image.clip_draw(self.frame * 200, 0, 200, 171, self.x, self.y)
+            else:
+                self.image.clip_draw(self.frame * 190, 0, 190, 170, self.x, self.y)
 
     def hit(self, attack):
         self.boss_nowhp -= attack

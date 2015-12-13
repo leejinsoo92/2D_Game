@@ -15,6 +15,7 @@ import game_framework
 import title_state
 import stage2
 import main_state3
+import GameOver
 
 name = "Second_State"
 
@@ -23,6 +24,7 @@ pig = None
 bullet = None
 stage_2 = None
 font = None
+sound = None
 
 monster_list = []
 
@@ -30,10 +32,10 @@ current_time = 0.0
 regen_time = 0.0
 death_time = 0.0
 
-monster_count = 30
+monster_count = 40
 
 def enter():
-    global character, bullets, font,state_2
+    global character, bullets, font,state_2, sound
     global current_time
 
     current_time = get_time()
@@ -47,9 +49,15 @@ def enter():
     character.now_hp = converter.character_nowhp
     character.max_hp = converter.character_maxhp
     character.damage = converter.chracter_damage
+    character.skill_gauge = converter.skill_gauge
 
     state_2 = Floor2()
     bullets = list()
+
+    #사운드
+    sound = load_music('resource/Sound/stage_2.mp3')
+    sound.set_volume(128)
+    sound.repeat_play()
 
     state_2.set_center_object(character)
     character.set_floor(state_2)
@@ -93,6 +101,7 @@ def handle_events(frame_time):
             converter.character_maxhp = character.max_hp
             converter.character_drawhp = int(character.now_hp * (100 / character.max_hp))
             converter.chracter_damage = character.damage
+            converter.skill_gauge = character.skill_gauge
             game_framework.change_state(main_state3)
         else:
             character.handle_event(event)
@@ -184,6 +193,10 @@ def update(frame_time):
                     bullets.remove(bullet)
         # if bullet.sx > 900:
         #     bullets.remove(bullet)
+
+    if character.now_hp <= 0:
+        sound.stop()
+        game_framework.change_state(GameOver)
 
 def draw(frame_time):
     clear_canvas()
